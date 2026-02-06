@@ -1,7 +1,18 @@
 import requests
 import base64
+from argon2 import PasswordHasher
 
 API_URL = "https://account.spfn.net/api/v2"
+ph = PasswordHasher()
+
+def hash_password(password: str):
+    return ph.hash(password)
+
+def verify_password(hashed: str, password: str):
+    try:
+        return ph.verify(hashed, password)
+    except Exception:
+        return False
 
 def get_token(username, password):
     creds = f"{username} {password}"
@@ -13,7 +24,7 @@ def get_token(username, password):
     }
     
     response = requests.get(f"{API_URL}/oauth2/generate_token", headers=headers, timeout=10)
-    return response.json().get("token") if response.ok else None
+    return response.json() if response.ok else None
 
 def get_profile(token):
     headers = {
