@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, DateTime, ForeignKey, Text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.exc import OperationalError
 from config import settings
 import uuid
 
@@ -20,8 +20,18 @@ class Session(Base):
     expires_at = Column(DateTime, nullable=True)
     remember_me = Column(Boolean, default=False)
 
-engine = create_engine(settings.db_url)
+engine = create_engine(settings.db_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("database tables ensured")
+    except OperationalError as e:
+        print(f"database connection error: {str(e)}")
+        raise
+    except Exception as e:
+        print(f"database setup error: {str(e)}")
+        raise
+
+init_db()
