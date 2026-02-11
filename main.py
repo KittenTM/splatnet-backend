@@ -4,6 +4,7 @@ from config import settings
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
+from routes import logout
 
 app = FastAPI()
 
@@ -27,6 +28,7 @@ async def force_cors_on_errors(request: Request, call_next):
 
 app.include_router(sso.router, prefix="/api/v2/sso")
 app.include_router(user.router, prefix="/api/v1/users")
+app.include_router(logout.router, prefix="/api/v1")
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=True)
