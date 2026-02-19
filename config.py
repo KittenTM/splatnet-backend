@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     fernet_key: str
     cookie_httponly: bool = False
     frontend_url: str
+    boss_url: str
+    boss_aes_key: str
+    boss_hmac_key: str
+    
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     cookie_secure: bool = False
 
