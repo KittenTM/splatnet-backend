@@ -83,8 +83,8 @@ async def login(
             key="session_id",
             value=active_session.id,
             httponly=settings.cookie_httponly,
-            secure=False,
-            samesite="lax",
+            secure=settings.cookie_secure,
+            samesite="none",
             path="/",
             max_age=cookie_age,
             domain=None

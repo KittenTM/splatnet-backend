@@ -10,17 +10,6 @@ from services.boss_retrieval import process_boss_file
 from contextlib import asynccontextmanager
 import asyncio
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[settings.frontend_url], 
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Set-Cookie"],
-)
-
 async def boss_worker_loop():
     print("background worker started")
     while True:
@@ -29,10 +18,6 @@ async def boss_worker_loop():
             process_boss_file()
         except Exception as e:
             print(f"worker error: {e}")
-        
-        # TODO: actually sync to what schedule says.
-        # for now its set to 1hr just incase pretendo fuckery happens
-        # (such as rotation ending)
         await asyncio.sleep(3600)
 
 @asynccontextmanager
@@ -43,6 +28,15 @@ async def lifespan(app: FastAPI):
     task.cancel()
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.frontend_url], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["Set-Cookie"],
+)
 
 @app.middleware("http")
 async def force_cors_on_errors(request: Request, call_next):

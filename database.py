@@ -23,6 +23,7 @@ class Session(Base):
 engine = create_engine(settings.db_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# TODO: look into why this is being called twice on startup
 def init_db():
     try:
         Base.metadata.create_all(bind=engine)
