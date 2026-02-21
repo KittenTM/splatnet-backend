@@ -1,11 +1,10 @@
-![SplatNet](/cover.png "Cover.png")
-
+<p align= "center">
+<img src="/cover.png" width=600>
 ---
 
-![Current Progress:](/currentprogress.png "currentprogress.png")
 
-<p align="center">
-  <img src="https://progress-bar.xyz/10?title=&height=20" width="100%">
+   <img src="/currentprogress.png" height=50px> 
+  <img src="https://progress-bar.xyz/10?title=&height=20&show_text=false" width="100%" height=20px>
   <br>
   <strong>Basically 0% lol</strong>
 </p>
