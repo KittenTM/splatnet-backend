@@ -1,3 +1,17 @@
+![SplatNet](/cover.png "Cover.png")
+
+---
+
+![Current Progress:](/currentprogress.png "currentprogress.png")
+
+<p align="center">
+  <img src="https://progress-bar.xyz/10?title=&height=20" width="100%">
+  <br>
+  <strong>Basically 0% lol</strong>
+</p>
+
+---
+
 > [!IMPORTANT]  
 > this readme is incomplete and you should not rely on it at this time.
 
