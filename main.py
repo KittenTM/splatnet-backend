@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from routes import sso, user
+from routes import sessionid_check, sso
 from config import settings
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,7 +48,7 @@ async def force_cors_on_errors(request: Request, call_next):
     return response
 
 app.include_router(sso.router, prefix="/api/v2/sso")
-app.include_router(user.router, prefix="/api/v1/users")
+app.include_router(sessionid_check.router, prefix="/api/v1")
 app.include_router(logout.router, prefix="/api/v1")
 app.include_router(boss.router, prefix="/api/v1")
 

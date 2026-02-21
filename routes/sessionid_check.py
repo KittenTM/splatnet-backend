@@ -12,7 +12,7 @@ def get_db():
     finally:
         db.close()
 
-@router.get('/me')
+@router.get('/session_id/check')
 async def get_current_user(request: Request, db: DBSession = Depends(get_db)):
     session_id = request.cookies.get("session_id")
     if not session_id:
