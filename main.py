@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from routes import sessionid_check, sso
 from config import settings
 import uvicorn
@@ -11,6 +11,17 @@ from routes import me
 from services.boss_retrieval import process_boss_file
 from contextlib import asynccontextmanager
 import asyncio
+import subprocess
+import signal
+import sys
+import httpx
+import os
+
+JUDD_CMD = ["node", "server.js"]
+JUDD_CWD = "./judd"
+
+judd_process = None
+
 
 async def boss_worker_loop():
     print("background worker started")
@@ -24,21 +35,71 @@ async def boss_worker_loop():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    task = asyncio.create_task(boss_worker_loop())
+    global judd_process
+
+    print("starting judd server")
+    
+    env_vars = os.environ.copy()
+    env_vars.update({k.upper(): str(v) for k, v in settings.model_dump().items()})
+
+    judd_process = subprocess.Popen(
+        JUDD_CMD,
+        cwd=JUDD_CWD,
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        env=env_vars,
+    )
+
+    worker = asyncio.create_task(boss_worker_loop())
     yield
     print("shutdown: cancelling background tasks")
-    task.cancel()
+    worker.cancel()
+
+    if judd_process:
+        judd_process.send_signal(signal.SIGINT)
+        judd_process.wait()
+
 
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url], 
+    allow_origins=[settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Set-Cookie"],
 )
+
+
+@app.middleware("http")
+async def proxy_fallback(request: Request, call_next):
+    response = await call_next(request)
+
+    if response.status_code != 404:
+        return response
+
+    url = f"http://127.0.0.1:{settings.judd_port}{request.url.path}"
+    body = await request.body()
+
+    async with httpx.AsyncClient() as client:
+        try:
+            judd_resp = await client.request(
+                request.method,
+                url,
+                headers={k: v for k, v in request.headers.items() if k.lower() != "host"},
+                params=request.query_params,
+                content=body,
+            )
+        except httpx.RequestError:
+            return response
+
+    return Response(
+        content=judd_resp.content,
+        status_code=judd_resp.status_code,
+        headers=dict(judd_resp.headers),
+    )
+
 
 @app.middleware("http")
 async def force_cors_on_errors(request: Request, call_next):

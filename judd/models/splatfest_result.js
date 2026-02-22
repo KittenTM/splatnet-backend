@@ -1,0 +1,79 @@
+const { DataTypes } = require('sequelize');
+const { connection } = require('../database');
+
+const SplatfestResult = connection.define('SplatfestResult', {
+    type: { type: DataTypes.STRING },
+    bossUniqueId: { type: DataTypes.STRING },
+    bossDigest: { type: DataTypes.STRING },
+    ServerEnv: { type: DataTypes.STRING },
+    PId: { type: DataTypes.BIGINT },
+    MiiName: { type: DataTypes.STRING },
+    Model: { type: DataTypes.INTEGER },
+    Skin: { type: DataTypes.INTEGER },
+    EyeColor: { type: DataTypes.INTEGER },
+    Weapon: { type: DataTypes.INTEGER },
+    SumPaint: { type: DataTypes.INTEGER },
+    Gear_Shoes: { type: DataTypes.INTEGER },
+    Gear_Shoes_Skill0: { type: DataTypes.INTEGER },
+    Gear_Shoes_Skill1: { type: DataTypes.INTEGER },
+    Gear_Shoes_Skill2: { type: DataTypes.INTEGER },
+    Gear_Clothes: { type: DataTypes.INTEGER },
+    Gear_Clothes_Skill0: { type: DataTypes.INTEGER },
+    Gear_Clothes_Skill1: { type: DataTypes.INTEGER },
+    Gear_Clothes_Skill2: { type: DataTypes.INTEGER },
+    Gear_Head: { type: DataTypes.INTEGER },
+    Gear_Head_Skill0: { type: DataTypes.INTEGER },
+    Gear_Head_Skill1: { type: DataTypes.INTEGER },
+    Gear_Head_Skill2: { type: DataTypes.INTEGER },
+    Rank: { type: DataTypes.INTEGER },
+    Udemae: { type: DataTypes.INTEGER },
+    RegularKillSum: { type: DataTypes.INTEGER },
+    WinSum: { type: DataTypes.INTEGER },
+    LoseSum: { type: DataTypes.INTEGER },
+    TodaysCondition: { type: DataTypes.INTEGER },
+    Region: { type: DataTypes.STRING },
+    Area: { type: DataTypes.INTEGER },
+    FesID: { type: DataTypes.INTEGER },
+    FesState: { type: DataTypes.INTEGER },
+    FesTeam: { type: DataTypes.INTEGER },
+    FesGrade: { type: DataTypes.INTEGER },
+    FesPoint: { type: DataTypes.INTEGER },
+    FesPower: { type: DataTypes.INTEGER },
+    BestFesPower: { type: DataTypes.INTEGER },
+    Money: { type: DataTypes.INTEGER },
+    Shell: { type: DataTypes.INTEGER },
+    TotalBonusShell: { type: DataTypes.INTEGER },
+    MatchingTime: { type: DataTypes.INTEGER },
+    IsRematch: { type: DataTypes.INTEGER },
+    SaveDataCorrupted: { type: DataTypes.INTEGER },
+    DisconnectedPId: { type: DataTypes.BIGINT },
+    DisconnectedMemHash: { type: DataTypes.BIGINT },
+    SessionID: { type: DataTypes.BIGINT },
+    StartNetworkTime: { type: DataTypes.BIGINT },
+    GameMode: { type: DataTypes.INTEGER },
+    Rule: { type: DataTypes.INTEGER },
+    Stage: { type: DataTypes.INTEGER },
+    Team: { type: DataTypes.INTEGER },
+    IsWinGame: { type: DataTypes.INTEGER },
+    Kill: { type: DataTypes.INTEGER },
+    Death: { type: DataTypes.INTEGER },
+    Paint: { type: DataTypes.INTEGER },
+    IsNetworkBurst: { type: DataTypes.INTEGER },
+    BottleneckPlayerNum: { type: DataTypes.INTEGER },
+    MaxSilenceFrame: { type: DataTypes.INTEGER },
+    MemoryHash: { type: DataTypes.BIGINT },
+    Paint_Alpha: { type: DataTypes.INTEGER },
+    Paint_Bravo: { type: DataTypes.INTEGER },
+    FaceImg: { type: DataTypes.BLOB }
+}, {
+    tableName: 'results',
+    timestamps: true
+});
+
+SplatfestResult.afterCreate((result, options) => {
+    console.log('---------------------');
+    console.log(result.toJSON());
+    console.log('');
+});
+
+module.exports = { SplatfestResult };

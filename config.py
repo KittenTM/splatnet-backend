@@ -3,6 +3,7 @@ from cryptography.fernet import Fernet
 
 class Settings(BaseSettings):
     port: int = 5000
+    judd_port: int = 4000
     db_url: str
     fernet_key: str
     cookie_httponly: bool = True
