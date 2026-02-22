@@ -10,8 +10,12 @@
 
 ---
 
+### Overview
+
+This project is set up in a weird way. To properly host, first install all the python dependencies, then in `/judd` install the node modules. The way this server works is main.py launches and manages Judd alongside the API for the web server. While this technically means you can seperate Judd and run it by itself, it is not reccomended and can run into issues. It is best to run them on the same server via `main.py`.
+
 > [!IMPORTANT]  
-> this readme is incomplete and you should not rely on it at this time.
+> This project is not easy to self host!! While I have made attempts to mitigate that, I do not want to update the readme everytime I add a new dependency. Proceed with caution ;-;
 
 ### .env configuration
 The .env file is used for server setup. A example one with the fields already there has been provided for your pleasure. Rename it to .env & fill in the fields.
@@ -27,5 +31,7 @@ The .env file is used for server setup. A example one with the fields already th
 | `boss_aes_key` | `str` | *Required* | AES key for Boss |
 | `boss_hmac_key` | `str` | *Required* | HMAC key for Boss |
 | `cookie_secure` | `bool` | `True` | Primarily for debugging, controls the flag in cookies |
+| `judd_port` | `int` | `4000` | The port the Judd (telemetry) server will listen on |
 
-For dumping your boss keys, see [this](https://github.com/PretendoNetwork/BetterKeyDumper/releases/tag/v1.0.0) HBL app. Note that the keys shown on the screen are garbage, I reccomend using a hex editor on the files it dumps.
+> [!TIP]
+> For dumping your boss keys, see [this](https://github.com/PretendoNetwork/BetterKeyDumper/releases/tag/v1.0.0) HBL app. Note that the keys shown on the screen are garbage, I reccomend using a hex editor on the files it dumps.
