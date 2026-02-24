@@ -38,9 +38,17 @@ async def boss_rotation(request: Request):
         with open("boss.yaml", "r") as f:
             yaml_data = yaml.safe_load(f)
         
-        base_time_str = yaml_data.get("ByamlInfo", {}).get("BaseByamlStartTime", "2026-02-06T06:00:00.0000000Z")
-        base_time_str = base_time_str.replace('Z', '+00:00')
-        current_time = datetime.fromisoformat(base_time_str)
+
+        #temporary spfn patch lols
+        date_str = yaml_data.get("DateTime")
+        if not date_str:
+             date_str = "2023-10-30T07:00:00+09:00"
+        
+        if isinstance(date_str, datetime):
+            current_time = date_str
+        else:
+            date_str = date_str.replace('Z', '+00:00')
+            current_time = datetime.fromisoformat(date_str)
 
         rotations = {}
 
