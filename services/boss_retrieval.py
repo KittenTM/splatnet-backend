@@ -2,6 +2,7 @@ import subprocess
 import requests
 import oead
 import os
+import xml.etree.ElementTree as ET
 from config import settings
 
 def process_boss_file():
@@ -14,8 +15,18 @@ def process_boss_file():
         return False
 
     try:
-        boss_url = settings.boss_url
-        res = requests.get(boss_url, timeout=10)
+        master_url = settings.boss_url
+        print(f"data get: {master_url}")
+        meta_res = requests.get(master_url, timeout=10)
+        meta_res.raise_for_status()
+        root = ET.fromstring(meta_res.content)
+        data_url_element = root.find(".//Url")
+        if data_url_element is None or not data_url_element.text:
+            print("woops! no <Url> tag found in the XML response")
+            return False
+        real_data_url = data_url_element.text.strip()
+        print(f"parsed data url: {real_data_url}")
+        res = requests.get(real_data_url, timeout=10)
         res.raise_for_status()
         
         with open(temp_boss, "wb") as f:
@@ -45,6 +56,9 @@ def process_boss_file():
         print(f"yay! success: {output_yaml}")
         return True
 
+    except ET.ParseError:
+        print("woops! the url returned non xml... we're hanging here")
+        return False
     except Exception as e:
         print(f"exception {e}")
         return False
