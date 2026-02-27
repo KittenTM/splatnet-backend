@@ -5,24 +5,22 @@ router.post('/post', async (request, response, next) => {
     const title = titles[request.titleCode];
 
     if (!title) {
-        console.error(`Title config not found for code: ${request.titleCode}`);
-        return response.status(500).send('error: title not configured');
+        console.warn(`[Blocked] POST request with unknown title code: ${request.titleCode}`);
+        return response.status(404).send('Not Found');
     }
 
-    const resultType = title.type;
     const ResultTypeModel = title.result_model;
 
     try {
         const result = await ResultTypeModel.create({
-            type: resultType,
+            type: title.type,
             bossUniqueId: request.headers['x-boss-uniqueid'],
             bossDigest: request.headers['x-boss-digest'],
-            ...request.resultData
+            ...request.resultData 
         });
-        console.log(`[Database] Saved ${resultType} result for ID: ${result.bossUniqueId}`);
         
     } catch (error) {
-        console.error('Database Save Error:', error);
+        console.error('[Database Error]', error.message);
         return next(error);
     }
 

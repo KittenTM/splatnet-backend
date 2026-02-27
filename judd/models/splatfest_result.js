@@ -69,11 +69,4 @@ const SplatfestResult = connection.define('SplatfestResult', {
     tableName: 'results',
     timestamps: true
 });
-
-SplatfestResult.afterCreate((result, options) => {
-    console.log('---------------------');
-    console.log(result.toJSON());
-    console.log('');
-});
-
 module.exports = { SplatfestResult };

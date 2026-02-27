@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const routes = require('./routes')
+const telemetryRoute = require('./routes/post');
 const titleCodeMiddleware = require('./middleware/title-code');
 const rawBodyMiddleware = require('./middleware/raw-body');
 const validateBOSSDigestMiddleware = require('./middleware/validate-boss-digest');
@@ -18,7 +19,7 @@ app.use(rawBodyMiddleware);
 app.use(validateBOSSDigestMiddleware);
 app.use(copyRequestStreamMiddleware);
 app.use(validateMultipartMiddleware);
-app.use(routes.post);
+app.use(telemetryRoute);
 
 app.use((request, response) => {
     const protocol = request.protocol;
