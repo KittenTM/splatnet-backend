@@ -1,0 +1,22 @@
+name: backend
+
+on:
+  push:
+    branches: [ fg-actions ]
+
+jobs:
+  docker:
+    runs-on: docker
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: login
+        run: echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
+
+      - name: build
+        run: docker build -t $DOCKER_USER/splatnet-backend:latest .
+
+      - name: push
+        run: docker push $DOCKER_USER/splatnet-backend:latest
