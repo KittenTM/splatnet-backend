@@ -11,8 +11,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: set up Docker
-        uses: tsteenbe/setup-docker-action@master
+      - name: install docker???
+        run: apt update && apt install docker.io
 
       - name: set up Docker Buildx
         uses: docker/setup-buildx-action@v3
