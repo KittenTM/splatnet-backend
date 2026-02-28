@@ -3,21 +3,66 @@
 <br>
 
    <img src="https://git.crafterpika.cc/kittentm/splatnet-backend/raw/branch/main/currentprogress.png" height=50px> 
-  <img src="https://progress-bar.xyz/10?title=&height=20&show_text=false" width="100%" height=20px>
+  <img src="https://progress-bar.xyz/40?title=&height=20&show_text=false" width="100%" height=20px>
   <br>
   <strong>Basically 0% lol</strong>
 </p>
 
 ---
+<div align=center>
 
-### Overview
+# SplatNet
 
-This project is set up in a weird way. To properly host, first install all the python dependencies, then in `/judd` install the node modules. The way this server works is main.py launches and manages Judd alongside the API for the web server. While this technically means you can seperate Judd and run it by itself, it is not reccomended and can run into issues. It is best to run them on the same server via `main.py`.
+[![Commits](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgit.crafterpika.cc%2Fapi%2Fv1%2Frepos%2Fkittentm%2Fsplatnet-backend%2Fcommits&query=%24.length&label=commits&style=for-the-badge&color=blue)](https://git.crafterpika.cc/kittentm/splatnet-backend/commits/branch/main)
+[![Build Status](https://git.crafterpika.cc/kittentm/splatnet-backend/badges/workflows/build.yml/badge.svg?style=for-the-badge)](https://git.crafterpika.cc/kittentm/splatnet-backend/actions)
+[![Languages](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgit.crafterpika.cc%2Fapi%2Fv1%2Frepos%2Fkittentm%2Fsplatnet-backend%2Flanguages&query=%24.*~&label=language&style=for-the-badge&color=yellow)](https://git.crafterpika.cc/kittentm/splatnet-backend)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge&logo=gnu&logoColor=white)](https://git.crafterpika.cc/kittentm/splatnet-backend/src/branch/main/LICENSE)
+
+</div>
+
+This is the backend for the [SplatNet](https://git.crafterpika.cc/kittentm/splatnet) Revival frontend. It is a combination of Python & JS.
+
+## Self-hosting
 
 > [!IMPORTANT]  
-> This project is not easy to self host!! While I have made attempts to mitigate that, I do not want to update the readme everytime I add a new dependency. Proceed with caution ;-;
+> This project is not easy to self host!! Please please please read the console logs before asking for help.
 
-### .env configuration
+### Running from source
+
+To start, install Python `3.11+`. While newer versions aren't tested they should work fine. Dependencies are installed using
+```
+pip install -r requirements.txt
+```
+
+Telemetry is technically not required for the server to run, however it is required for most functions on the website. Judd is run via Node `/judd`. First change directories to Judd, and install the node modules.
+```
+npm install
+```
+Now you must configure your `.env` A example `.env` is included for you. For a full explanation, jump to [.env configuration](https://git.crafterpika.cc/kittentm/splatnet-backend#env-configuration).
+Once done, run `/main.py`. This will launch both the frontend api & telemetry.
+
+### Docker
+Alternatively, this is available as a Docker image.
+
+> [!NOTE]  
+> Postgres & incoming connections will have to be manually allowed through into Docker
+
+```
+docker run kittentm/splatnet-backend:latest
+```
+
+By default, the program will look for the `.env` in the same directory main.py is located. If you wish to not do that, you can manually specify a `.env`
+
+Here is an example of that, it pulls from your current directory for the .env.
+```
+docker run --env-file .env kittentm/splatnet-backend:latest
+```
+
+## DB Config
+
+This project requires postgres. Database setup is automatic upon startup, so all you need to do is add your database URL in the .env.
+
+## .env configuration
 The .env file is used for server setup. A example one with the fields already there has been provided for your pleasure. Rename it to .env & fill in the fields.
 
 | Field Name | Type | Default Value | Description / Usage |
