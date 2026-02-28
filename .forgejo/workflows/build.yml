@@ -6,7 +6,7 @@ on:
 
 jobs:
   docker:
-    runs-on: docker
+    runs-on: debian-bookworm
     steps:
     - name: checkout
       uses: actions/checkout@v4
