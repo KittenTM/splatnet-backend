@@ -2,7 +2,7 @@ name: backend
 
 on:
   push:
-    branches: [ fg-actions ]
+    branches: [ main ]
 
 jobs:
   docker:
