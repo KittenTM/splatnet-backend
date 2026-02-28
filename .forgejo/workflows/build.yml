@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: install docker???
-        run: apt update && apt install docker.io -y
+        run: wget "https://download.docker.com/linux/debian/dists/bookworm/pool/stable/amd64/docker-ce-cli_29.2.1-1~debian.12~bookworm_amd64.deb" -o docker-ce.deb && dpkg -i docker-ce.deb -y
 
       - name: set up Docker Buildx
         uses: docker/setup-buildx-action@v3
