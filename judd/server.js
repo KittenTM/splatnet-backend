@@ -8,6 +8,9 @@ const validateBOSSDigestMiddleware = require('./middleware/validate-boss-digest'
 const copyRequestStreamMiddleware = require('./middleware/copy-request-stream');
 const validateMultipartMiddleware = require('./middleware/validate-multipart');
 const database = require('./database');
+require('./models/splatfest_result');
+require('./models/equipment');
+require('./models/equipmentLast');
 
 const app = express();
 app.set('trust proxy', true);
