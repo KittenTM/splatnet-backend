@@ -1,10 +1,43 @@
 const multer = require('multer');
 const { joi } = require('../util');
 const { SplatfestResult } = require('../models/splatfest_result');
+const { Equipment } = require('../models/equipment');
+const { EquipmentLast } = require('../models/equipmentLast');
 
 module.exports = {
     type: 'telemetry',
-    result_model: SplatfestResult,
+    result_model: {
+        create: async (data) => {
+            const result = await SplatfestResult.create(data);
+
+            await Equipment.create({
+                PId: data.PId,
+                weapon: data.Weapon,
+                sumpaint: data.SumPaint
+            });
+
+            await EquipmentLast.upsert({
+                PId: data.PId,
+                weapon: data.Weapon,
+                Gear_Shoes: data.Gear_Shoes,
+                Gear_Shoes_Skill0: data.Gear_Shoes_Skill0,
+                Gear_Shoes_Skill1: data.Gear_Shoes_Skill1,
+                Gear_Shoes_Skill2: data.Gear_Shoes_Skill2,
+                Gear_Clothes: data.Gear_Clothes,
+                Gear_Clothes_Skill0: data.Gear_Clothes_Skill0,
+                Gear_Clothes_Skill1: data.Gear_Clothes_Skill1,
+                Gear_Clothes_Skill2: data.Gear_Clothes_Skill2,
+                Gear_Head: data.Gear_Head,
+                Gear_Head_Skill0: data.Gear_Head_Skill0,
+                Gear_Head_Skill1: data.Gear_Head_Skill1,
+                Gear_Head_Skill2: data.Gear_Head_Skill2,
+                Rank: data.Rank,
+                Udemae: data.Udemae
+            });
+
+            return result;
+        }
+    },
     validation_schema: joi.object({
         ServerEnv: joi.string(),
         PId: joi.numberstring(),
