@@ -10,7 +10,7 @@ module.exports = {
         create: async (data) => {
             const result = await SplatfestResult.create(data);
 
-            await Equipment.create({
+            await Equipment.upsert({
                 PId: data.PId,
                 weapon: data.Weapon,
                 sumpaint: data.SumPaint
