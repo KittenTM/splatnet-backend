@@ -77,6 +77,7 @@ The .env file is used for server setup. A example one with the fields already th
 | `boss_hmac_key` | `str` | *Required* | HMAC key for Boss |
 | `cookie_secure` | `bool` | `True` | Primarily for debugging, controls the flag in cookies |
 | `judd_port` | `int` | `4000` | The port the Judd (telemetry) server will listen on |
+| `webhook_url` | str | *Required* | Where logging of blacklist.json will be sent to |
 
 > [!TIP]
 > For dumping your boss keys, see [this](https://github.com/PretendoNetwork/BetterKeyDumper/releases/tag/v1.0.0) HBL app. Note that the keys shown on the screen are garbage, I reccomend using a hex editor on the files it dumps.
