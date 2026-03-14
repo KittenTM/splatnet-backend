@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     cookie_secure: bool = True
+    webhook_url: str
 
 settings = Settings()
 cipher = Fernet(settings.fernet_key.encode())
