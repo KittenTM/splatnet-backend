@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy import create_engine, Column, String, Integer, Boolean, DateTime, ForeignKey, Text, BigInteger
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import OperationalError
 from config import settings
@@ -19,6 +19,31 @@ class Session(Base):
     username = Column(String(16), ForeignKey("users.username"), nullable=False)
     expires_at = Column(DateTime, nullable=True)
     remember_me = Column(Boolean, default=False)
+
+class Equipment(Base):
+    __tablename__ = 'equipment'
+    PId = Column(BigInteger, primary_key=True)
+    weapon = Column(Integer, primary_key=True)
+    sumpaint = Column(Integer)
+
+class EquipmentLast(Base):
+    __tablename__ = 'equipment_last'
+    PId = Column(BigInteger, primary_key=True)
+    weapon = Column(Integer)
+    Gear_Shoes = Column(Integer)
+    Gear_Shoes_Skill0 = Column(Integer)
+    Gear_Shoes_Skill1 = Column(Integer)
+    Gear_Shoes_Skill2 = Column(Integer)
+    Gear_Clothes = Column(Integer)
+    Gear_Clothes_Skill0 = Column(Integer)
+    Gear_Clothes_Skill1 = Column(Integer)
+    Gear_Clothes_Skill2 = Column(Integer)
+    Gear_Head = Column(Integer)
+    Gear_Head_Skill0 = Column(Integer)
+    Gear_Head_Skill1 = Column(Integer)
+    Gear_Head_Skill2 = Column(Integer)
+    Rank = Column(Integer)
+    Udemae = Column(Integer)
 
 engine = create_engine(settings.db_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

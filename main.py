@@ -8,6 +8,7 @@ from routes import logout
 from routes import boss
 #yes meow meow import me please... i want to be embedded into my code... :pleading_face:
 from routes import me
+from routes import equipment
 from services.boss_retrieval import process_boss_file
 from contextlib import asynccontextmanager
 import asyncio
@@ -115,6 +116,7 @@ app.include_router(sessionid_check.router, prefix="/api/v1")
 app.include_router(logout.router, prefix="/api/v1")
 app.include_router(boss.router, prefix="/api/v1")
 app.include_router(me.router, prefix="/api/v1")
+app.include_router(equipment.router, prefix="/api/v1")
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=True)
