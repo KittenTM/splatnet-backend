@@ -8,7 +8,7 @@ from routes import logout
 from routes import boss
 #yes meow meow import me please... i want to be embedded into my code... :pleading_face:
 from routes import me
-from routes import equipment
+from routes.equipment import equipment
 from services.boss_retrieval import process_boss_file
 from contextlib import asynccontextmanager
 import asyncio
