@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.orm import Session as DBSession
-from database import SessionLocal, User, Session as UserSession, Equipment, EquipmentLast
+from database import SessionLocal, User, Session as UserSession, Equipment
 from services import auth
 from config import cipher
 import json
@@ -14,8 +14,8 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/me/equipment")
-async def get_equipment_composite(request: Request, db: DBSession = Depends(get_db)):
+@router.get("/me/equipment/history")
+async def get_history(request: Request, db: DBSession = Depends(get_db)):
     session_id = request.cookies.get("session_id")
     db_session = db.query(UserSession).filter(UserSession.id == session_id).first()
     
@@ -29,13 +29,10 @@ async def get_equipment_composite(request: Request, db: DBSession = Depends(get_
         token_data = auth.get_token(user.username, decrypted_pass)
         profile = json.loads(auth.get_profile(token_data["token"]))
         pid_val = int(profile.get("pid"))
-        mii_name = profile.get("name", user.username)
-        last_gear = db.query(EquipmentLast).filter(EquipmentLast.PId == pid_val).first()
-
-        return {
-            "mii_name": mii_name,
-            "last_equipped": last_gear
-        }
+        print(f"Fetching History for PID: {pid_val}")
+        
+        results = db.query(Equipment).filter(Equipment.PId == pid_val).all()
+        return results
     except Exception as e:
-        print(f"Equipment Route Error: {e}")
-        return {"mii_name": user.username, "last_equipped": None}
+        print(f"Error in history route: {e}")
+        return []
