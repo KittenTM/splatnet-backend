@@ -47,6 +47,7 @@ module.exports = {
                     defaults: {
                         MiiName: data.MiiName,
                         Rank: data.Rank,
+                        FesPower: parseFloat(data.FesPower) || 0,
                         WinSum: 0,
                         LoseSum: 0,
                         RankingScore: 0
@@ -69,6 +70,7 @@ module.exports = {
                 await stats.update({
                     MiiName: data.MiiName,
                     Rank: data.Rank,
+                    FesPower: parseFloat(data.FesPower) || 0,
                     WinSum: currentWins,
                     LoseSum: currentLosses,
                     RankingScore: newRankingScore

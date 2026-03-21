@@ -20,6 +20,10 @@ const PlayerRank = connection.define('PlayerRank', {
         type: DataTypes.INTEGER,
         defaultValue: 0
     },
+    FesPower: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0.0
+    },
     WinSum: {
         type: DataTypes.INTEGER,
         defaultValue: 0
