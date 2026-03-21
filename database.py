@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, Boolean, DateTime, ForeignKey, Text, BigInteger
+from sqlalchemy import create_engine, Column, String, Integer, Boolean, DateTime, ForeignKey, Text, BigInteger, Float, func
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import OperationalError
 from config import settings
@@ -44,6 +44,20 @@ class EquipmentLast(Base):
     Gear_Head_Skill2 = Column(Integer)
     Rank = Column(Integer)
     Udemae = Column(Integer)
+
+class PlayerRank(Base):
+    __tablename__ = 'player_ranks'
+
+    PId = Column(BigInteger, primary_key=True, nullable=False)
+    GameMode = Column(Integer, primary_key=True, nullable=False)
+    MiiName = Column(String, nullable=True)
+    Rank = Column(Integer, default=0)
+    FesPower = Column(Float, default=0.0)
+    WinSum = Column(Integer, default=0)
+    LoseSum = Column(Integer, default=0)
+    RankingScore = Column(Float, default=0.0)
+    createdAt = Column(DateTime, server_default=func.now())
+    updatedAt = Column(DateTime, onupdate=func.now())
 
 engine = create_engine(settings.db_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
