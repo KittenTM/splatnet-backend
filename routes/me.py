@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session as DBSession
 from database import SessionLocal, User, Session as UserSession
 from services import auth
@@ -16,23 +17,24 @@ def get_db():
 @router.get("/me")
 async def get_my_profile(request: Request, db: DBSession = Depends(get_db)):
     session_id = request.cookies.get("session_id")
+    
     if not session_id:
-        raise HTTPException(status_code=401, detail="No active session")
+        return RedirectResponse(url="/sign_in/")
 
     db_session = db.query(UserSession).filter(UserSession.id == session_id).first()
     if not db_session:
-        raise HTTPException(status_code=401, detail="Invalid session")
+        return RedirectResponse(url="/sign_in/")
 
     user = db.query(User).filter(User.username == db_session.username).first()
     if not user or not user.spfn_pass_enc:
-        raise HTTPException(status_code=401, detail="Credentials not found. Please re-login.")
+        return RedirectResponse(url="/sign_in/")
 
     try:
         decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
 
         token_data = auth.get_token(user.username, decrypted_pass)
         if not token_data or "token" not in token_data:
-            raise HTTPException(status_code=401, detail="External authentication failed")
+            return RedirectResponse(url="/sign_in/")
 
         profile_data = auth.get_profile(token_data["token"])
         if not profile_data:
