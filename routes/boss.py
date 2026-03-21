@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response
 import yaml
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 router = APIRouter()
 
@@ -38,31 +38,36 @@ async def boss_rotation(request: Request):
         with open("boss.yaml", "r") as f:
             yaml_data = yaml.safe_load(f)
         
-        base_time_str = yaml_data.get("ByamlInfo", {}).get("BaseByamlStartTime", "2026-02-06T06:00:00.0000000Z")
-        base_time_str = base_time_str.replace('Z', '+00:00')
-        current_time = datetime.fromisoformat(base_time_str)
-
+        start_time = yaml_data.get("DateTime")
+        if isinstance(start_time, str):
+            start_time = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+        
+        current_rotation_start = start_time
         rotations = {}
 
         for phase in yaml_data.get("Phases", []):
-            ts_ms = str(int(current_time.timestamp() * 1000))
-            turf_stages = []
-            for s in phase.get("RegularStages", []):
-                mid = s.get("MapID")
-                turf_stages.append({"mapID": mid, "translatedNames": MAP_DATA.get(mid, {})})
+            ts_ms = str(int(current_rotation_start.timestamp() * 1000))
+            
+            def format_stages(stage_list):
+                formatted = []
+                for s in stage_list:
+                    mid = s.get("MapID")
+                    formatted.append({
+                        "mapID": mid, 
+                        "translatedNames": MAP_DATA.get(mid, {"en-US": "Unknown Stage"})
+                    })
+                return formatted
 
-            ranked_stages = []
-            for s in phase.get("GachiStages", []):
-                mid = s.get("MapID")
-                ranked_stages.append({"mapID": mid, "translatedNames": MAP_DATA.get(mid, {})})
-
+            duration = phase.get("Time", 4)
             rotations[ts_ms] = {
-                "turfStages": turf_stages,
-                "rankedStages": ranked_stages,
+                "startTime": current_rotation_start.isoformat(),
+                "duration": duration,
+                "turfStages": format_stages(phase.get("RegularStages", [])),
+                "rankedStages": format_stages(phase.get("GachiStages", [])),
                 "rankedMode": RULE_NAMES.get(phase.get("GachiRule"), "SplatZones")
             }
 
-            current_time += timedelta(hours=2)
+            current_rotation_start += timedelta(hours=duration)
 
         response_data = {
             "nintendo": {
