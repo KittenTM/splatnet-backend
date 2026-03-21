@@ -3,6 +3,7 @@ const { joi } = require('../util');
 const { SplatfestResult } = require('../models/splatfest_result');
 const { Equipment } = require('../models/equipment');
 const { EquipmentLast } = require('../models/equipmentLast');
+const { PlayerRank } = require('../models/playerRank');
 
 module.exports = {
     type: 'telemetry',
@@ -34,6 +35,45 @@ module.exports = {
                 Rank: data.Rank,
                 Udemae: data.Udemae
             });
+            const gameMode = parseInt(data.GameMode);
+            
+            if (gameMode !== 3 && gameMode !== 4) {
+                const isWin = Number(data.IsWinGame) === 1;
+                const [stats, created] = await PlayerRank.findOrCreate({
+                    where: { 
+                        PId: data.PId, 
+                        GameMode: data.GameMode 
+                    },
+                    defaults: {
+                        MiiName: data.MiiName,
+                        Rank: data.Rank,
+                        WinSum: 0,
+                        LoseSum: 0,
+                        RankingScore: 0
+                    }
+                });
+                let currentWins = stats.WinSum;
+                let currentLosses = stats.LoseSum;
+
+                if (isWin) {
+                    currentWins += 1;
+                } else {
+                    currentLosses += 1;
+                }
+
+                const totalGames = currentWins + currentLosses;
+
+                const winRate = totalGames > 0 ? (currentWins / totalGames) : 0;
+                const newRankingScore = currentWins * winRate * 10;
+
+                await stats.update({
+                    MiiName: data.MiiName,
+                    Rank: data.Rank,
+                    WinSum: currentWins,
+                    LoseSum: currentLosses,
+                    RankingScore: newRankingScore
+                });
+            }
 
             return result;
         }
