@@ -36,18 +36,21 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
 
             mode_results = []
             for player in top_players:
-                player_pid_tuple = (player.PId,)
-                is_top_100 = player_pid_tuple in top_100_tuples
-                mode_results.append({
+                player_data = {
                     "PId": player.PId,
                     "MiiName": player.MiiName,
                     "Rank": player.Rank,
                     "WinSum": player.WinSum,
                     "LoseSum": player.LoseSum,
                     "RankingScore": round(player.RankingScore, 2),
-                    "FesPower": player.FesPower,
-                    "is_top_100_fes": is_top_100
-                })
+                }
+
+                if mode == 2:
+                    is_top_100 = (player.PId,) in top_100_tuples
+                    player_data["FesPower"] = player.FesPower
+                    player_data["is_top_100_fes"] = is_top_100
+                
+                mode_results.append(player_data)
             
             leaderboard[f"mode_{mode}"] = mode_results
 
