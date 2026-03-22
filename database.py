@@ -59,7 +59,14 @@ class PlayerRank(Base):
     createdAt = Column(DateTime, server_default=func.now())
     updatedAt = Column(DateTime, onupdate=func.now())
 
-engine = create_engine(settings.db_url, pool_pre_ping=True)
+engine = create_engine(
+    settings.db_url, 
+    pool_pre_ping=True,
+    pool_size=20,
+    max_overflow=30,
+    pool_timeout=60,
+    pool_recycle=1800
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # TODO: look into why this is being called twice on startup
