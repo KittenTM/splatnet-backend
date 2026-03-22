@@ -59,6 +59,14 @@ class PlayerRank(Base):
     createdAt = Column(DateTime, server_default=func.now())
     updatedAt = Column(DateTime, onupdate=func.now())
 
+class TwitterLink(Base):
+    __tablename__ = "twitter_link"
+    pid = Column(Integer, primary_key=True)
+    twitter_handle = Column(String)
+    twitter_token_enc = Column(String)
+    twitter_refresh_token_enc = Column(String)
+    miidata_enc = Column(String)
+
 engine = create_engine(
     settings.db_url, 
     pool_pre_ping=True,

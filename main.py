@@ -12,6 +12,7 @@ from routes.equipment import equipment_history
 from routes.equipment import equipment
 from services.boss_retrieval import process_boss_file
 from routes import Ranking
+from routes import twitter_link
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from sqlalchemy import delete
@@ -155,6 +156,7 @@ app.include_router(me.router, prefix="/api/v1")
 app.include_router(equipment_history.router, prefix="/api/v1")
 app.include_router(equipment.router, prefix="/api/v1")
 app.include_router(Ranking.router, prefix="/api/v1")
+app.include_router(twitter_link.router, prefix="/api/v1")
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=True)

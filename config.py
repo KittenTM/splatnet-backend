@@ -11,7 +11,10 @@ class Settings(BaseSettings):
     boss_url: str
     boss_aes_key: str
     boss_hmac_key: str
-    
+    twitter_client_id: str
+    twitter_client_secret: str
+    twitter_redirect_uri: str
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     cookie_secure: bool = True
     webhook_url: str
