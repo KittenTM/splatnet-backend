@@ -3,7 +3,7 @@ from routes import sessionid_check, sso
 from config import settings
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from database import init_db
+from database import init_db, SessionLocal, PlayerRank # Added for reset logic
 from routes import logout
 from routes import boss
 #yes meow meow import me please... i want to be embedded into my code... :pleading_face:
@@ -13,6 +13,8 @@ from routes.equipment import equipment
 from services.boss_retrieval import process_boss_file
 from routes import Ranking
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
+from sqlalchemy import delete
 import asyncio
 import subprocess
 import signal
@@ -25,7 +27,6 @@ JUDD_CWD = "./judd"
 
 judd_process = None
 
-
 async def boss_worker_loop():
     print("background worker started")
     while True:
@@ -35,6 +36,37 @@ async def boss_worker_loop():
         except Exception as e:
             print(f"worker error: {e}")
         await asyncio.sleep(3600)
+
+async def weekly_rank_reset_loop():
+    print("weekly_rank_reset worker started")
+    while True:
+        now = datetime.now()
+        days_ahead = 6 - now.weekday()
+        if days_ahead <= 0: 
+            days_ahead += 7
+            
+        next_sunday = now + timedelta(days=days_ahead)
+        next_run = next_sunday.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        wait_seconds = (next_run - now).total_seconds()
+        print(f"Next ranking reset scheduled for: {next_run} (in {wait_seconds:.0f} seconds)")
+        
+        try:
+            await asyncio.sleep(wait_seconds)
+            
+            print("Executing weekly ranking reset...")
+            with SessionLocal() as db:
+                db.execute(delete(PlayerRank))
+                db.commit()
+            print("Ranking table cleared successfully.")
+            
+            await asyncio.sleep(60) 
+            
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            print(f"Ranking reset error: {e}")
+            await asyncio.sleep(60)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -52,11 +84,13 @@ async def lifespan(app: FastAPI):
         stderr=sys.stderr,
         env=env_vars,
     )
-
-    worker = asyncio.create_task(boss_worker_loop())
+    boss_task = asyncio.create_task(boss_worker_loop())
+    reset_task = asyncio.create_task(weekly_rank_reset_loop())
+    
     yield
     print("shutdown: cancelling background tasks")
-    worker.cancel()
+    boss_task.cancel()
+    reset_task.cancel()
 
     if judd_process:
         judd_process.send_signal(signal.SIGINT)
