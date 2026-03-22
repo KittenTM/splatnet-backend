@@ -21,9 +21,8 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
             .limit(100)
             .all()
         )
-        top_100_pids = {row for row in top_100_query}
-        modes = [0, 1, 2]
-
+        top_100_tuples = set(top_100_query)
+        modes = {0, 1, 2}
         leaderboard = {}
 
         for mode in modes:
@@ -37,6 +36,8 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
 
             mode_results = []
             for player in top_players:
+                player_pid_tuple = (player.PId,)
+                is_top_100 = player_pid_tuple in top_100_tuples
                 mode_results.append({
                     "PId": player.PId,
                     "MiiName": player.MiiName,
@@ -45,7 +46,7 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
                     "LoseSum": player.LoseSum,
                     "RankingScore": round(player.RankingScore, 2),
                     "FesPower": player.FesPower,
-                    "is_top_100_fes": player.PId in top_100_pids
+                    "is_top_100_fes": is_top_100
                 })
             
             leaderboard[f"mode_{mode}"] = mode_results
@@ -53,5 +54,5 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
         return leaderboard
 
     except Exception as e:
-        print(f"Error fetching leaderboard: {e}")
+        print(f"Error: {e}")
         return {"error": str(e)}
