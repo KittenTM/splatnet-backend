@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import desc
-from database import SessionLocal, PlayerRank
+from database import SessionLocal, PlayerRank, EquipmentLast
 
 router = APIRouter()
 
@@ -22,12 +22,14 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
             .all()
         )
         top_100_tuples = set(top_100_query)
+        
         modes = {0, 1, 2}
         leaderboard = {}
 
         for mode in modes:
             top_players = (
-                db.query(PlayerRank)
+                db.query(PlayerRank, EquipmentLast)
+                .outerjoin(EquipmentLast, PlayerRank.PId == EquipmentLast.PId)
                 .filter(PlayerRank.GameMode == mode)
                 .order_by(desc(PlayerRank.RankingScore))
                 .limit(9)
@@ -35,7 +37,7 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
             )
 
             mode_results = []
-            for player in top_players:
+            for player, gear in top_players:
                 player_data = {
                     "PId": player.PId,
                     "MiiName": player.MiiName,
@@ -43,6 +45,10 @@ async def get_leaderboard(db: DBSession = Depends(get_db)):
                     "WinSum": player.WinSum,
                     "LoseSum": player.LoseSum,
                     "RankingScore": round(player.RankingScore, 2),
+                    "weapon": gear.weapon if gear else None,
+                    "headgear": gear.Gear_Head if gear else None,
+                    "clothes": gear.Gear_Clothes if gear else None,
+                    "shoes": gear.Gear_Shoes if gear else None,
                 }
 
                 if mode == 2:
