@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const rateLimit = require('express-rate-limit');
 const titles = require('../titles');
 const { WebhookClient, EmbedBuilder } = require('discord.js');
 const lookup = require('./ids.json');
@@ -6,7 +7,17 @@ const blacklist = require('./blacklist.json');
 
 const webhookClient = new WebhookClient({ url: process.env.WEBHOOK_URL });
 
-router.post('/post', async (request, response, next) => {
+const postLimiter = rateLimit({
+    windowMs: 30 * 1000,
+    max: 1,
+    statusCode: 500,
+    message: 'ratelimited chi!!! slow ur roll bud',
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false },
+});
+
+router.post('/post', postLimiter, async (request, response, next) => {
     const title = titles[request.titleCode];
 
     if (!title) {
