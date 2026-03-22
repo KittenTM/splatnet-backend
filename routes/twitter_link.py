@@ -131,3 +131,105 @@ async def confirm_twitter(state: str, code: str, db: DBSession = Depends(get_db)
     pkce_store.pop(state, None)
 
     return {"status": "success", "pid": pid, "handle": handle}
+
+@router.get("/me/twitter/status")
+async def get_twitter_status(request: Request, db: DBSession = Depends(get_db)):
+    session_id = request.cookies.get("session_id")
+    if not session_id:
+        raise HTTPException(status_code=401)
+
+    db_session = db.query(UserSession).filter(UserSession.id == session_id).first()
+    if not db_session:
+        raise HTTPException(status_code=401)
+
+    user = db.query(User).filter(User.username == db_session.username).first()
+    if not user or not user.spfn_pass_enc:
+        raise HTTPException(status_code=404)
+
+    try:
+        decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
+        profile_auth = auth.get_token(user.username, decrypted_pass)
+        profile_res = auth.get_profile(profile_auth["token"])
+        
+        if isinstance(profile_res, str):
+            profile_data = json.loads(profile_res)
+        else:
+            profile_data = profile_res
+            
+        pid = profile_data.get("pid")
+        
+        tw_link = db.query(TwitterLink).filter(TwitterLink.pid == pid).first()
+        
+        if tw_link:
+            return {
+                "is_linked": True,
+                "twitter_handle": tw_link.twitter_handle
+            }
+        return {"is_linked": False}
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to check twitter status")
+
+@router.post("/me/twitter/unlink")
+async def unlink_twitter(request: Request, db: DBSession = Depends(get_db)):
+    session_id = request.cookies.get("session_id")
+    if not session_id:
+        raise HTTPException(status_code=401)
+
+    db_session = db.query(UserSession).filter(UserSession.id == session_id).first()
+    if not db_session:
+        raise HTTPException(status_code=401)
+
+    user = db.query(User).filter(User.username == db_session.username).first()
+    decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
+    profile_auth = auth.get_token(user.username, decrypted_pass)
+    profile_data = auth.get_profile(profile_auth["token"])
+    
+    if isinstance(profile_data, str):
+        profile_data = json.loads(profile_data)
+
+    pid = profile_data.get("pid")
+
+    tw_link = db.query(TwitterLink).filter(TwitterLink.pid == pid).first()
+
+    if tw_link:
+        def decrypt_val(val):
+            return cipher.decrypt(val.encode()).decode() if val else None
+
+        access_token = decrypt_val(tw_link.twitter_token_enc)
+        refresh_token = decrypt_val(tw_link.twitter_refresh_token_enc)
+
+        auth_str = f"{settings.twitter_client_id}:{settings.twitter_client_secret}"
+        encoded_auth = base64.b64encode(auth_str.encode()).decode()
+
+        async with httpx.AsyncClient() as client:
+            if access_token:
+                await client.post(
+                    "https://api.twitter.com/2/oauth2/revoke",
+                    headers={
+                        "Authorization": f"Basic {encoded_auth}",
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    data={
+                        "token": access_token,
+                        "token_type_hint": "access_token",
+                    },
+                )
+
+            if refresh_token:
+                await client.post(
+                    "https://api.twitter.com/2/oauth2/revoke",
+                    headers={
+                        "Authorization": f"Basic {encoded_auth}",
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    data={
+                        "token": refresh_token,
+                        "token_type_hint": "refresh_token",
+                    },
+                )
+
+        db.delete(tw_link)
+        db.commit()
+
+    return {"status": "success"}
