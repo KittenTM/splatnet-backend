@@ -3,7 +3,9 @@ from routes import sessionid_check, sso
 from config import settings
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from database import init_db, SessionLocal, PlayerRank # Added for reset logic
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+from database import init_db, SessionLocal, PlayerRank
 from routes import logout
 from routes import boss
 #yes meow meow import me please... i want to be embedded into my code... :pleading_face:
@@ -60,6 +62,8 @@ async def weekly_rank_reset_loop():
                 db.execute(delete(PlayerRank))
                 db.commit()
             print("Ranking table cleared successfully.")
+            await FastAPICache.clear() 
+            print("Cache cleared")
             
             await asyncio.sleep(60) 
             
@@ -71,6 +75,7 @@ async def weekly_rank_reset_loop():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    FastAPICache.init(InMemoryBackend())
     global judd_process
 
     print("starting judd server")

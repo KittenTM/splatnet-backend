@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Response
 import yaml
 import json
 from datetime import datetime, timedelta, timezone
+from fastapi_cache.decorator import cache
 
 router = APIRouter()
 
@@ -33,6 +34,7 @@ RULE_NAMES = {
 }
 
 @router.api_route('/boss', methods=['GET', 'POST'])
+@cache(expire=3660)
 async def boss_rotation(request: Request):
     try:
         with open("boss.yaml", "r") as f:
@@ -78,7 +80,7 @@ async def boss_rotation(request: Request):
             }
         }
         
-        return Response(content=json.dumps(response_data), media_type="application/json")
+        return response_data
 
     except Exception as e:
         return Response(content=json.dumps({"error": str(e)}), status_code=500, media_type="application/json")

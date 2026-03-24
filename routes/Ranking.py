@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import desc
 from database import SessionLocal, PlayerRank, EquipmentLast
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+from fastapi_cache.decorator import cache
 
 router = APIRouter()
 
@@ -13,6 +16,7 @@ def get_db():
         db.close()
 
 @router.get("/leaderboard")
+@cache(expire=60)
 async def get_leaderboard(db: DBSession = Depends(get_db)):
     try:
         top_100_query = (
