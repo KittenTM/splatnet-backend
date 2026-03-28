@@ -2,3 +2,5 @@ __pycache__
 .env
 boss.yaml
 node_modules
+build
+splatnet_backend.egg-info

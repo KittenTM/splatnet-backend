@@ -18,6 +18,7 @@ from routes import twitter_link
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from sqlalchemy import delete
+from config import BASE_DIR
 import asyncio
 import subprocess
 import signal
@@ -25,8 +26,9 @@ import sys
 import httpx
 import os
 
-JUDD_CMD = ["node", "server.js"]
-JUDD_CWD = "./judd"
+JUDD_CWD = os.path.join(BASE_DIR, "judd")
+JUDD_SERVER_JS = os.path.join(JUDD_CWD, "server.js") 
+JUDD_CMD = ["node", JUDD_SERVER_JS]
 
 judd_process = None
 
@@ -163,5 +165,8 @@ app.include_router(equipment.router, prefix="/api/v1")
 app.include_router(Ranking.router, prefix="/api/v1")
 app.include_router(twitter_link.router, prefix="/api/v1")
 
-if __name__ == '__main__':
+def start():
     uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=True)
+
+if __name__ == '__main__':
+    start()

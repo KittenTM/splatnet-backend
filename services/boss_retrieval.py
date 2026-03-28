@@ -3,12 +3,12 @@ import requests
 import oead
 import os
 import xml.etree.ElementTree as ET
-from config import settings
+from config import settings, BASE_DIR
 
 def process_boss_file():
     temp_boss = "bosstemp.bin"
     output_yaml = "boss.yaml"
-    decrypt_script = os.path.join("services", "decrypt.js")
+    decrypt_script = os.path.join(BASE_DIR, "services", "decrypt.js")
     
     if not os.path.exists(decrypt_script):
         print(f"{decrypt_script} is missing!")
