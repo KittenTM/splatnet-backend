@@ -12,7 +12,7 @@ COPY . .
 
 RUN cd judd && npm ci
 
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir . -v
 
 RUN touch .env
 
