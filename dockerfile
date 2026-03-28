@@ -8,15 +8,16 @@ RUN apt-get update && apt-get install -y curl build-essential \
 
 WORKDIR /app
 
-COPY . .
+COPY judd/package.json judd/package-lock.json ./judd/
 
 RUN cd judd && npm ci
+
+COPY . .
 
 RUN pip install --no-cache-dir . -v
 
 RUN touch .env
 
-# uses default
 EXPOSE 5000
 
 CMD ["splatnet"]
