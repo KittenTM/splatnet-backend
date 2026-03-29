@@ -2,7 +2,8 @@ name: backend
 
 on:
   push:
-    branches: ['**']  
+    branches: ['**']
+  workflow_dispatch:
 
 jobs:
   docker:
@@ -18,6 +19,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: login
+      if: github.event_name == 'workflow_dispatch'
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
@@ -29,6 +31,7 @@ jobs:
       run: docker build -t $DOCKER_USER/splatnet-backend:latest .
 
     - name: push
+      if: github.event_name == 'workflow_dispatch'
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
       run: docker push $DOCKER_USER/splatnet-backend:latest
