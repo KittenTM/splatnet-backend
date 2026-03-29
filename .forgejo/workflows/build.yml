@@ -16,7 +16,7 @@ jobs:
       run: apt update && apt install wget -y && wget "https://download.docker.com/linux/debian/dists/bookworm/pool/stable/amd64/docker-ce-cli_29.2.1-1~debian.12~bookworm_amd64.deb" && dpkg --force-confold -i "docker-ce-cli_29.2.1-1~debian.12~bookworm_amd64.deb"
 
     - name: set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v4
 
     - name: login
       if: github.event_name == 'workflow_dispatch'
