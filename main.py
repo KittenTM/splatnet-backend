@@ -119,36 +119,49 @@ app.add_middleware(
 
 @app.middleware("http")
 async def proxy_fallback(request: Request, call_next):
-    response = await call_next(request)
+    path = request.url.path
+    if path == "/api/v1/post":
+        path = "/post"
+        url = f"http://127.0.0.1:{settings.judd_port}{path}"
+        body = await request.body()
+        async with httpx.AsyncClient() as client:
+            try:
+                judd_resp = await client.request(
+                    request.method,
+                    url,
+                    headers={k: v for k, v in request.headers.items() if k.lower() != "host"},
+                    params=request.query_params,
+                    content=body,
+                )
+                response = Response(
+                    content=judd_resp.content,
+                    status_code=judd_resp.status_code,
+                    headers=dict(judd_resp.headers),
+                )
+            except httpx.RequestError:
+                response = await call_next(request)
+    else:
+        response = await call_next(request)
+        if response.status_code == 404:
+            url = f"http://127.0.0.1:{settings.judd_port}{path}"
+            body = await request.body()
+            async with httpx.AsyncClient() as client:
+                try:
+                    judd_resp = await client.request(
+                        request.method,
+                        url,
+                        headers={k: v for k, v in request.headers.items() if k.lower() != "host"},
+                        params=request.query_params,
+                        content=body,
+                    )
+                    response = Response(
+                        content=judd_resp.content,
+                        status_code=judd_resp.status_code,
+                        headers=dict(judd_resp.headers),
+                    )
+                except httpx.RequestError:
+                    pass
 
-    if response.status_code != 404:
-        return response
-
-    url = f"http://127.0.0.1:{settings.judd_port}{request.url.path}"
-    body = await request.body()
-
-    async with httpx.AsyncClient() as client:
-        try:
-            judd_resp = await client.request(
-                request.method,
-                url,
-                headers={k: v for k, v in request.headers.items() if k.lower() != "host"},
-                params=request.query_params,
-                content=body,
-            )
-        except httpx.RequestError:
-            return response
-
-    return Response(
-        content=judd_resp.content,
-        status_code=judd_resp.status_code,
-        headers=dict(judd_resp.headers),
-    )
-
-
-@app.middleware("http")
-async def force_cors_on_errors(request: Request, call_next):
-    response = await call_next(request)
     origin = request.headers.get("origin")
     if origin == settings.frontend_url:
         response.headers["Access-Control-Allow-Origin"] = origin
