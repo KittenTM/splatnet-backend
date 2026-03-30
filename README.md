@@ -18,28 +18,36 @@
 [![Languages](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgit.crafterpika.cc%2Fapi%2Fv1%2Frepos%2Fkittentm%2Fsplatnet-backend%2Flanguages&query=%24.*~&label=language&style=for-the-badge&color=yellow)](https://git.crafterpika.cc/kittentm/splatnet-backend)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge&logo=gnu&logoColor=white)](https://git.crafterpika.cc/kittentm/splatnet-backend/src/branch/main/LICENSE)
 
-</div>
-
 This is the backend for the [SplatNet](https://git.crafterpika.cc/kittentm/splatnet) Revival frontend. It is a combination of Python & JS.
+
+</div>
 
 ## Self-hosting
 
 > [!IMPORTANT]  
 > This project is not easy to self host!! Please please please read the console logs before asking for help.
 
-### Running from source
-
-To start, install Python `3.11+`. While newer versions aren't tested they should work fine. Dependencies are installed using
-```
-pip install -r requirements.txt
-```
+### Installing from source
 
 Telemetry is technically not required for the server to run, however it is required for most functions on the website. Judd is run via Node `/judd`. First change directories to Judd, and install the node modules.
 ```
 npm install
 ```
+
+To start, install Python `3.11+`. While newer versions aren't tested they should work fine. Then install using:
+```
+pip install . -v
+```
+
+> [!NOTE]  
+> It is not required to run in verbose, however is reccomended as otherwise it looks like it has hung. The installation progress will take awhile as it copies all Node modules.
+
 Now you must configure your `.env` A example `.env` is included for you. For a full explanation, jump to [.env configuration](https://git.crafterpika.cc/kittentm/splatnet-backend#env-configuration).
-Once done, run `/main.py`. This will launch both the frontend api & telemetry.
+Once done, run:
+```
+splatnet
+```
+This uses the `.env` found in your current directory.
 
 ### Docker
 Alternatively, this is available as a Docker image.
