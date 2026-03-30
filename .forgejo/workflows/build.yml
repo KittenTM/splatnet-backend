@@ -10,7 +10,7 @@ jobs:
     runs-on: debian-bookworm
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: install docker???
       run: apt update && apt install wget -y && wget "https://download.docker.com/linux/debian/dists/bookworm/pool/stable/amd64/docker-ce-cli_29.2.1-1~debian.12~bookworm_amd64.deb" && dpkg --force-confold -i "docker-ce-cli_29.2.1-1~debian.12~bookworm_amd64.deb"
