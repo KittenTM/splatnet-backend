@@ -37,6 +37,16 @@ RULE_NAMES = {
 @cache(expire=3660)
 async def boss_rotation(request: Request):
     try:
+        def format_stages(stage_list):
+            formatted = []
+            for s in stage_list:
+                mid = s.get("MapID")
+                formatted.append({
+                    "mapID": mid, 
+                    "translatedNames": MAP_DATA.get(mid, {"en-US": "Unknown Stage"})
+                })
+            return formatted
+
         with open("boss.yaml", "r") as f:
             yaml_data = yaml.safe_load(f)
         
@@ -50,16 +60,6 @@ async def boss_rotation(request: Request):
         for phase in yaml_data.get("Phases", []):
             ts_ms = str(int(current_rotation_start.timestamp() * 1000))
             
-            def format_stages(stage_list):
-                formatted = []
-                for s in stage_list:
-                    mid = s.get("MapID")
-                    formatted.append({
-                        "mapID": mid, 
-                        "translatedNames": MAP_DATA.get(mid, {"en-US": "Unknown Stage"})
-                    })
-                return formatted
-
             duration = phase.get("Time", 4)
             rotations[ts_ms] = {
                 "startTime": current_rotation_start.isoformat(),
@@ -79,6 +79,42 @@ async def boss_rotation(request: Request):
                 "rotations": rotations
             }
         }
+
+        try:
+            with open("fes_boss.yaml", "r") as f:
+                fes_yaml = yaml.safe_load(f)
+            
+            if fes_yaml:
+                time_cfg = fes_yaml.get("Time", {})
+                
+                def parse_iso(iso_str):
+                    if not iso_str: return None
+                    return int(datetime.fromisoformat(iso_str.replace('Z', '+00:00')).timestamp())
+
+                fest_start = parse_iso(time_cfg.get("Start"))
+                fest_end = parse_iso(time_cfg.get("End"))
+                fest_announce = parse_iso(time_cfg.get("Announce"))
+                fest_result = parse_iso(time_cfg.get("Result"))
+
+                teams = fes_yaml.get("Teams", [])
+                team_shortnames = []
+                for team in teams:
+                    team_shortnames.append(team.get("ShortName", {}))
+
+                response_data["splatfestivalSplatfest"] = {
+                    "stages": format_stages(fes_yaml.get("Stages", [])),
+                    "mode": RULE_NAMES.get(fes_yaml.get("Rule"), "TurfWar"),
+                    "teams": team_shortnames,
+                    "time": {
+                        "start": fest_start,
+                        "end": fest_end,
+                        "annoucement": fest_announce,
+                        "results": fest_result
+                    },
+                    "festivalID": fes_yaml.get("FestivalId", 0)
+                }
+        except FileNotFoundError:
+            pass
         
         return response_data
 
