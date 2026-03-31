@@ -15,8 +15,11 @@ def process_boss_file():
         return False
 
     try:
-        master_url = settings.boss_url
+        base_url = settings.boss_url.rstrip('/')
+        master_url = f"{base_url}/zvGSM4kOrXpkKnpT/schdat2?c=JP&l=en"
+        
         print(f"data get: {master_url}")
+        
         meta_res = requests.get(master_url, timeout=10)
         meta_res.raise_for_status()
         root = ET.fromstring(meta_res.content)
