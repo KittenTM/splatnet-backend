@@ -119,48 +119,7 @@ app.add_middleware(
 
 @app.middleware("http")
 async def proxy_fallback(request: Request, call_next):
-    path = request.url.path
-    if path == "/api/v1/post":
-        path = "/post"
-        url = f"http://127.0.0.1:{settings.judd_port}{path}"
-        body = await request.body()
-        async with httpx.AsyncClient() as client:
-            try:
-                judd_resp = await client.request(
-                    request.method,
-                    url,
-                    headers={k: v for k, v in request.headers.items() if k.lower() != "host"},
-                    params=request.query_params,
-                    content=body,
-                )
-                response = Response(
-                    content=judd_resp.content,
-                    status_code=judd_resp.status_code,
-                    headers=dict(judd_resp.headers),
-                )
-            except httpx.RequestError:
-                response = await call_next(request)
-    else:
-        response = await call_next(request)
-        if response.status_code == 404:
-            url = f"http://127.0.0.1:{settings.judd_port}{path}"
-            body = await request.body()
-            async with httpx.AsyncClient() as client:
-                try:
-                    judd_resp = await client.request(
-                        request.method,
-                        url,
-                        headers={k: v for k, v in request.headers.items() if k.lower() != "host"},
-                        params=request.query_params,
-                        content=body,
-                    )
-                    response = Response(
-                        content=judd_resp.content,
-                        status_code=judd_resp.status_code,
-                        headers=dict(judd_resp.headers),
-                    )
-                except httpx.RequestError:
-                    pass
+    response = await call_next(request)
 
     origin = request.headers.get("origin")
     if origin == settings.frontend_url:
@@ -179,7 +138,7 @@ app.include_router(Ranking.router, prefix="/api/v1")
 app.include_router(twitter_link.router, prefix="/api/v1")
 
 def start():
-    uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=False)
 
 if __name__ == '__main__':
     start()
