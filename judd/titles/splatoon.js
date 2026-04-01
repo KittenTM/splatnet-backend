@@ -138,8 +138,12 @@ module.exports = {
         BottleneckPlayerNum: joi.numberstring(),
         MaxSilenceFrame: joi.numberstring(),
         MemoryHash: joi.numberstring(),
+        //swaps Paint_TEAM for RemainCount_TEAM.
+        //Paint_TEAM is used in turf, RemainCount is used in Ranked
         Paint_Alpha: joi.numberstring(),
         Paint_Bravo: joi.numberstring(),
+        RemainCount_Alpha: joi.numberstring(),
+        RemainCount_Bravo: joi.numberstring(),
         FaceImg: joi.binary()
     }).unknown(true).options({ presence: 'optional' }).required(),
     multipart_validator: multer().any()

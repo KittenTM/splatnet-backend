@@ -64,6 +64,8 @@ const SplatfestResult = connection.define('SplatfestResult', {
     MemoryHash: { type: DataTypes.BIGINT },
     Paint_Alpha: { type: DataTypes.INTEGER },
     Paint_Bravo: { type: DataTypes.INTEGER },
+    RemainCount_Alpha: { type: DataTypes.INTEGER },
+    RemainCount_Bravo: { type: DataTypes.INTEGER },
     FaceImg: { type: DataTypes.BLOB }
 }, {
     tableName: 'results',
