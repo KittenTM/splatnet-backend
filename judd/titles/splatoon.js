@@ -4,50 +4,61 @@ const { SplatfestResult } = require('../models/splatfest_result');
 const { Equipment } = require('../models/equipment');
 const { EquipmentLast } = require('../models/equipmentLast');
 const { PlayerRank } = require('../models/playerRank');
+const MAX_INT32 = 2147483647;
 
 module.exports = {
     type: 'telemetry',
     result_model: {
         create: async (data) => {
-            const result = await SplatfestResult.create(data);
+            const sanitizedData = { ...data };
+            
+            const rankValue = parseInt(data.Rank);
+            if (isNaN(rankValue) || rankValue > MAX_INT32 || rankValue < 0) {
+                sanitizedData.Rank = 0;
+            }
+
+            if (parseInt(data.SessionID) > MAX_INT32) sanitizedData.SessionID = 0;
+
+            const result = await SplatfestResult.create(sanitizedData);
 
             await Equipment.upsert({
-                PId: data.PId,
-                weapon: data.Weapon,
-                sumpaint: data.SumPaint
+                PId: sanitizedData.PId,
+                weapon: sanitizedData.Weapon,
+                sumpaint: sanitizedData.SumPaint
             });
 
             await EquipmentLast.upsert({
-                PId: data.PId,
-                weapon: data.Weapon,
-                Gear_Shoes: data.Gear_Shoes,
-                Gear_Shoes_Skill0: data.Gear_Shoes_Skill0,
-                Gear_Shoes_Skill1: data.Gear_Shoes_Skill1,
-                Gear_Shoes_Skill2: data.Gear_Shoes_Skill2,
-                Gear_Clothes: data.Gear_Clothes,
-                Gear_Clothes_Skill0: data.Gear_Clothes_Skill0,
-                Gear_Clothes_Skill1: data.Gear_Clothes_Skill1,
-                Gear_Clothes_Skill2: data.Gear_Clothes_Skill2,
-                Gear_Head: data.Gear_Head,
-                Gear_Head_Skill0: data.Gear_Head_Skill0,
-                Gear_Head_Skill1: data.Gear_Head_Skill1,
-                Gear_Head_Skill2: data.Gear_Head_Skill2,
-                Rank: data.Rank,
-                Udemae: data.Udemae
+                PId: sanitizedData.PId,
+                weapon: sanitizedData.Weapon,
+                Gear_Shoes: sanitizedData.Gear_Shoes,
+                Gear_Shoes_Skill0: sanitizedData.Gear_Shoes_Skill0,
+                Gear_Shoes_Skill1: sanitizedData.Gear_Shoes_Skill1,
+                Gear_Shoes_Skill2: sanitizedData.Gear_Shoes_Skill2,
+                Gear_Clothes: sanitizedData.Gear_Clothes,
+                Gear_Clothes_Skill0: sanitizedData.Gear_Clothes_Skill0,
+                Gear_Clothes_Skill1: sanitizedData.Gear_Clothes_Skill1,
+                Gear_Clothes_Skill2: sanitizedData.Gear_Clothes_Skill2,
+                Gear_Head: sanitizedData.Gear_Head,
+                Gear_Head_Skill0: sanitizedData.Gear_Head_Skill0,
+                Gear_Head_Skill1: sanitizedData.Gear_Head_Skill1,
+                Gear_Head_Skill2: sanitizedData.Gear_Head_Skill2,
+                Rank: sanitizedData.Rank,
+                Udemae: sanitizedData.Udemae
             });
-            const gameMode = parseInt(data.GameMode);
+
+            const gameMode = parseInt(sanitizedData.GameMode);
             
             if (gameMode !== 3 && gameMode !== 4) {
-                const isWin = Number(data.IsWinGame) === 1;
+                const isWin = Number(sanitizedData.IsWinGame) === 1;
                 const [stats, created] = await PlayerRank.findOrCreate({
                     where: { 
-                        PId: data.PId, 
-                        GameMode: data.GameMode 
+                        PId: sanitizedData.PId, 
+                        GameMode: sanitizedData.GameMode 
                     },
                     defaults: {
-                        MiiName: data.MiiName,
-                        Rank: data.Rank,
-                        FesPower: parseFloat(data.FesPower) || 0,
+                        MiiName: sanitizedData.MiiName,
+                        Rank: sanitizedData.Rank,
+                        FesPower: parseFloat(sanitizedData.FesPower) || 0,
                         WinSum: 0,
                         LoseSum: 0,
                         RankingScore: 0
@@ -68,9 +79,9 @@ module.exports = {
                 const newRankingScore = currentWins * winRate * 10;
 
                 await stats.update({
-                    MiiName: data.MiiName,
-                    Rank: data.Rank,
-                    FesPower: parseFloat(data.FesPower) || 0,
+                    MiiName: sanitizedData.MiiName,
+                    Rank: sanitizedData.Rank,
+                    FesPower: parseFloat(sanitizedData.FesPower) || 0,
                     WinSum: currentWins,
                     LoseSum: currentLosses,
                     RankingScore: newRankingScore
