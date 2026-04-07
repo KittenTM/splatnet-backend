@@ -44,20 +44,19 @@ async def login(
         print(f"checking user {username}")
         user = db.query(User).filter(User.username == username).first()
         
+        enc_pass = cipher.encrypt(password.encode()).decode()
+
         if not user:
             print("creating new user with argon2id")
-            enc_pass = cipher.encrypt(password.encode()).decode() if rememberMe else ""
             user = User(
                 username=username, 
                 local_hash=auth.hash_password(password), 
                 spfn_pass_enc=enc_pass
             )
             db.add(user)
-        elif rememberMe:
-            print("updating encrypted pass for client")
-            user.spfn_pass_enc = cipher.encrypt(password.encode()).decode()
         else:
-            print("client requested no password storage, skipping update")
+            print("updating encrypted pass for client")
+            user.spfn_pass_enc = enc_pass
         
         db.flush() 
 
