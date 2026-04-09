@@ -2,6 +2,7 @@ const router = require('express').Router();
 const rateLimit = require('express-rate-limit');
 const titles = require('../titles');
 const { WebhookClient, EmbedBuilder } = require('discord.js');
+const axios = require('axios'); 
 const lookup = require('./ids.json');
 const blacklist = require('./blacklist.json');
 
@@ -27,8 +28,34 @@ router.post('/post', postLimiter, async (request, response, next) => {
 
     const ResultTypeModel = title.result_model;
     const data = request.resultData || {};
+    const pid = data.PId || 'N/A';
+    const miiName = data.MiiName || 'N/A';
 
     try {
+        let isPidValid = true;
+        try {
+            const spfnCheck = await axios.get(`https://account.spfn.net/api/v2/users/${pid}/mii`);
+            if (typeof spfnCheck.data === 'string' && spfnCheck.data.includes('<code>0008</code>')) {
+                isPidValid = false;
+            }
+        } catch (err) {
+            isPidValid = false;
+        }
+
+        if (!isPidValid) {
+            const invalidPidEmbed = new EmbedBuilder()
+                .setTitle(":warning: | Invalid Telemetry received")
+                .setDescription("## PID is not a valid SPFN ID\nThis submission has been BLOCKED!")
+                .setColor(15158332)
+                .addFields(
+                    { name: "PID", value: `${pid}`, inline: true },
+                    { name: "Mii Name", value: `${miiName}`, inline: true }
+                );
+
+            await webhookClient.send({ embeds: [invalidPidEmbed] });
+            return response.status(500).send('Invalid PID... fuck off mate stop sending it');
+        }
+
         const result = await ResultTypeModel.create({
             type: title.type,
             bossUniqueId: request.headers['x-boss-uniqueid'],
