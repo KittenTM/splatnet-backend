@@ -16,7 +16,7 @@ dependencies = [
     "click==8.3.2",
     "colorama==0.4.6",
     "cryptography==46.0.7",
-    "fastapi==0.135.3",
+    "fastapi==0.135.4",
     "fastapi-cache2==0.2.2",
     "greenlet==3.4.0",
     "h11==0.16.0",
