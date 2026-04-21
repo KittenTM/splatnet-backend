@@ -47,7 +47,7 @@ async def boss_rotation(request: Request):
                 })
             return formatted
 
-        with open("boss.yaml", "r") as f:
+        with open("boss.yaml", "r", encoding='utf-8') as f:
             yaml_data = yaml.safe_load(f)
         
         start_time = yaml_data.get("DateTime")
@@ -81,7 +81,7 @@ async def boss_rotation(request: Request):
         }
 
         try:
-            with open("fes_boss.yaml", "r") as f:
+            with open("fes_boss.yaml", "r", encoding='utf-8') as f:
                 fes_yaml = yaml.safe_load(f)
             
             if fes_yaml:
