@@ -3,9 +3,8 @@
 <br>
 
    <img src="https://git.crafterpika.cc/kittentm/splatnet-backend/raw/branch/main/currentprogress.png" height=50px> 
-  <img src="https://progress-bar.xyz/40?title=&height=20&show_text=false" width="100%" height=20px>
+  <img src="https://progress-bar.xyz/65?title=&height=20&show_text=false" width="100%" height=20px>
   <br>
-  <strong>Basically 0% lol</strong>
 </p>
 
 ---
@@ -34,7 +33,7 @@ Telemetry is technically not required for the server to run, however it is requi
 npm install
 ```
 
-To start, install Python `3.11+`. While newer versions aren't tested they should work fine. Then install using:
+To start, install either Python `3.11` or `3.12`. While newer versions aren't tested they should work fine. Note that anything **ABOVE** 3.12 will require building oead from source, as it is a required dependency. View their documentation [here](https://oead.readthedocs.io/en/stable/about.html#building-from-source). Then install using:
 ```
 pip install . -v
 ```
