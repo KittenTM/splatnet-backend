@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y curl build-essential \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
