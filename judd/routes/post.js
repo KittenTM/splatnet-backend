@@ -63,17 +63,20 @@ router.post('/post', postLimiter, async (request, response, next) => {
             ...request.resultData 
         });
         const offenses = [];
+        const weaponExists = Object.prototype.hasOwnProperty.call(lookup.weapons_main, String(data.Weapon));
+        if (!weaponExists && data.Weapon !== undefined) offenses.push("Invalid Weapon ID");
         if ((blacklist.weapons || []).includes(Number(data.Weapon))) offenses.push("weapon");
         if ((blacklist.clothes || []).includes(Number(data.Gear_Clothes))) offenses.push("clothes");
         if ((blacklist.rules || []).includes(Number(data.Rule))) offenses.push("rule");
         if (offenses.length > 0) {
-            const sWep = offenses.includes("weapon") ? "⭐ " : "";
+            const sWep = (offenses.includes("weapon") || offenses.includes("Invalid Weapon ID")) ? "⭐ " : "";
             const sClt = offenses.includes("clothes") ? "⭐ " : "";
             const sRul = offenses.includes("rule") ? "⭐ " : "";
 
             const embed = new EmbedBuilder()
                 .setTitle(":warning:  | Invalid Telemetry received")
                 .setDescription(`## Offending information detected in: ${offenses.join(', ')}`)
+                .setColor(offenses.includes("Invalid Weapon ID") ? 0xFF9900 : 15158332)
                 .setFields(
                     {
                         name: "User Information:",
@@ -82,7 +85,11 @@ router.post('/post', postLimiter, async (request, response, next) => {
                     },
                     { name: "PID", value: `${data.PId || 'N/A'}`, inline: true },
                     { name: "Mii Name", value: `${data.MiiName || 'N/A'}`, inline: true },
-                    { name: "Weapon", value: `${sWep}${lookup.weapons_main[data.Weapon] || data.Weapon || 'N/A'}`, inline: true },
+                    { 
+                        name: "Weapon", 
+                        value: `${sWep}${lookup.weapons_main[data.Weapon] || `UNKNOWN ID: ${data.Weapon}`}`, 
+                        inline: true 
+                    },
                     { name: "Headgear", value: `${lookup.headgear[data.Gear_Head] || data.Gear_Head || 'N/A'}`, inline: true },
                     { name: "Clothes", value: `${sClt}${lookup.clothes[data.Gear_Clothes] || data.Gear_Clothes || 'N/A'}`, inline: true },
                     { name: "Shoes", value: `${lookup.shoes[data.Gear_Shoes] || data.Gear_Shoes || 'N/A'}`, inline: true },
