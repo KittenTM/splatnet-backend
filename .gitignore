@@ -5,3 +5,4 @@ fes_boss.yaml
 node_modules
 build
 splatnet_backend.egg-info
+venv/*
