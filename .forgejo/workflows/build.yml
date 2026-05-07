@@ -7,7 +7,7 @@ on:
 
 jobs:
   docker:
-    runs-on: debian-trixie
+    runs-on: [debian-trixie, debian-bookworm]
     steps:
     - name: checkout
       uses: actions/checkout@v6
