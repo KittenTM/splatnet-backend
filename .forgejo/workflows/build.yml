@@ -7,10 +7,12 @@ on:
 
 jobs:
   docker:
-    runs-on: [debian-trixie, debian-bookworm]
-    steps:
-    - name: checkout
-      uses: actions/checkout@v6
+    strategy:
+      fail-fast: false 
+      matrix:
+        os: [debian-trixie, debian-bookworm]
+    
+    runs-on: ${{ matrix.os }}
 
     - name: install docker???
       run: |
