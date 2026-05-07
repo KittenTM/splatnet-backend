@@ -14,7 +14,10 @@ jobs:
     
     runs-on: ${{ matrix.os }}
 
-    steps:
+    steps:     
+    - name: Checkout
+      uses: actions/checkout@v6
+     
     - name: install docker???
       run: |
         apt update && apt install wget cmake -y && \
