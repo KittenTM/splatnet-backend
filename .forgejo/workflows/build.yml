@@ -14,6 +14,7 @@ jobs:
     
     runs-on: ${{ matrix.os }}
 
+    steps:
     - name: install docker???
       run: |
         apt update && apt install wget cmake -y && \
