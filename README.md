@@ -12,12 +12,14 @@
 
 # SplatNet
 
-[![Commits](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgit.crafterpika.cc%2Fapi%2Fv1%2Frepos%2Fkittentm%2Fsplatnet-backend%2Fcommits&query=%24.length&label=commits&style=for-the-badge&color=blue)](https://git.crafterpika.cc/kittentm/splatnet-backend/commits/branch/main)
+![Last Commit](https://img.shields.io/gitea/last-commit/kittentm/splatnet-backend?gitea_url=https://git.crafterpika.cc&style=for-the-badge&color=blue)
 [![Build Status](https://git.crafterpika.cc/kittentm/splatnet-backend/badges/workflows/build.yml/badge.svg?style=for-the-badge)](https://git.crafterpika.cc/kittentm/splatnet-backend/actions)
-[![Languages](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgit.crafterpika.cc%2Fapi%2Fv1%2Frepos%2Fkittentm%2Fsplatnet-backend%2Flanguages&query=%24.*~&label=language&style=for-the-badge&color=yellow)](https://git.crafterpika.cc/kittentm/splatnet-backend)
+[![Languages](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgit.crafterpika.cc%2Fapi%2Fv1%2Frepos%2Fkittentm%2Fsplatnet-backend%2Flanguages&query=%24.*~&label=language&style=for-the-badge&color=blue)](https://git.crafterpika.cc/kittentm/splatnet-backend)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge&logo=gnu&logoColor=white)](https://git.crafterpika.cc/kittentm/splatnet-backend/src/branch/main/LICENSE)
+![L1 Service Status](https://img.shields.io/website?url=https%3A%2F%2Fsplatnet.spbr.net%2F&up_message=online&down_message=offline&style=for-the-badge&up_color=blue&down_color=red&label=Production+Instance)
+![T1 Service Status](https://img.shields.io/website?url=https%3A%2F%2Fsplatoon.cubexmine.dev%2F&up_message=online&down_message=offline&style=for-the-badge&up_color=blue&down_color=red&label=Testing+Instance)
 
-This is the backend for the [SplatNet](https://git.crafterpika.cc/kittentm/splatnet) Revival frontend. It is a combination of Python & JS.
+This is the backend for the [SplatNet](https://git.crafterpika.cc/kittentm/splatnet) Revival frontend.
 
 </div>
 
