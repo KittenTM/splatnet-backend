@@ -16,9 +16,10 @@ from services.boss_retrieval import process_boss_file
 from routes import Ranking
 from routes import twitter_link
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import delete
 from config import BASE_DIR
+import yaml
 import asyncio
 import subprocess
 import signal
@@ -31,6 +32,7 @@ JUDD_SERVER_JS = os.path.join(JUDD_CWD, "server.js")
 JUDD_CMD = ["node", JUDD_SERVER_JS]
 
 judd_process = None
+skip_upcoming_reset = False
 
 async def boss_worker_loop():
     print("background worker started")
@@ -43,30 +45,79 @@ async def boss_worker_loop():
         await asyncio.sleep(3600)
 
 async def weekly_rank_reset_loop():
+    global skip_upcoming_reset
     print("weekly_rank_reset worker started")
-    while True:
-        now = datetime.now()
-        days_ahead = 6 - now.weekday()
+    
+    FES_BOSS_PATH = os.path.join(BASE_DIR, "fes_boss.yaml")
+
+    def get_next_sunday_reset_time_utc():
+        now_utc = datetime.now(timezone.utc)
+        days_ahead = 6 - now_utc.weekday()
         if days_ahead <= 0: 
             days_ahead += 7
+        next_sunday_utc = now_utc + timedelta(days=days_ahead)
+        return next_sunday_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    async def check_splatfest_schedule_loop():
+        global skip_upcoming_reset
+        while True:
+            try:
+                target_reset_utc = get_next_sunday_reset_time_utc()
+                print(f"checking if a splatfest will be active at: {target_reset_utc.isoformat()}")
+                
+                if os.path.exists(FES_BOSS_PATH):
+                    with open(FES_BOSS_PATH, "r", encoding="utf-8") as f:
+                        fes_data = yaml.safe_load(f)
+                    
+                    if fes_data and "Time" in fes_data:
+                        start_time = datetime.fromisoformat(fes_data["Time"]["Start"])
+                        end_time = datetime.fromisoformat(fes_data["Time"]["End"])
+                        
+                        start_time_utc = start_time.astimezone(timezone.utc)
+                        end_time_utc = end_time.astimezone(timezone.utc)
+                        
+                        print(f"detected splatfest schedule: {start_time_utc.isoformat()} to {end_time_utc.isoformat()}")
+                        
+                        if start_time_utc <= target_reset_utc <= end_time_utc:
+                            skip_upcoming_reset = True
+                            print("Splatfest detected in reset window")
+                        else:
+                            skip_upcoming_reset = False
+                            print("No splatfest active in reset window, yay!!!")
+                else:
+                    print("could not find yaml, defaulted to no fest")
+                    skip_upcoming_reset = False
+                    
+            except Exception as e:
+                print(f"failed to check fest schedule: {e}")
             
-        next_sunday = now + timedelta(days=days_ahead)
-        next_run = next_sunday.replace(hour=0, minute=0, second=0, microsecond=0)
+            await asyncio.sleep(7200)
+
+    asyncio.create_task(check_splatfest_schedule_loop())
+
+    while True:
+        now_utc = datetime.now(timezone.utc)
+        next_run_utc = get_next_sunday_reset_time_utc()
+        wait_seconds = (next_run_utc - now_utc).total_seconds()
         
-        wait_seconds = (next_run - now).total_seconds()
-        print(f"Next ranking reset scheduled for: {next_run} (in {wait_seconds:.0f} seconds)")
+        print(f"Next ranking reset scheduled for: {next_run_utc.isoformat()} (in {wait_seconds:.0f} seconds)")
         
         try:
             await asyncio.sleep(wait_seconds)
             
-            print("Executing weekly ranking reset...")
-            with SessionLocal() as db:
-                db.execute(delete(PlayerRank))
-                db.commit()
-            print("Ranking table cleared successfully.")
-            await FastAPICache.clear() 
-            print("Cache cleared")
+            print("ranking reset triggerred!")
             
+            if skip_upcoming_reset:
+                print("Reset skipped due to active splatfest")
+            else:
+                print("Executing weekly ranking reset...")
+                with SessionLocal() as db:
+                    db.execute(delete(PlayerRank))
+                    db.commit()
+                print("Ranking table cleared successfully.")
+                await FastAPICache.clear() 
+                print("Cache cleared")
+                
             await asyncio.sleep(60) 
             
         except asyncio.CancelledError:
