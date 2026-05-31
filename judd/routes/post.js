@@ -40,7 +40,7 @@ router.post('/post', postLimiter, async (request, response, next) => {
             }
         } catch (err) {
             console.error(`Caught error when validating ${pid}:`, err.message || err);
-            isPidValid = false;
+            isPidValid = true;
         }
 
         if (!isPidValid) {
