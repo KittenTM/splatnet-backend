@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  docker:
+  splatnet:
     runs-on: debian-trixie
     steps:
     - name: Checkout
