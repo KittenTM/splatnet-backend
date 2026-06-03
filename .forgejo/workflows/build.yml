@@ -22,7 +22,7 @@ jobs:
     - name: build
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
-      run: docker build -t $DOCKER_USER/splatnet-backend:latest .
+      run: docker buildx build -t $DOCKER_USER/splatnet-backend:latest .
 
     - name: push
       if: github.event_name == 'workflow_dispatch'
