@@ -7,7 +7,7 @@ on:
 
 jobs:
   docker:
-    runs-on: debian-trixie
+    runs-on: ${{ vars.RUNNER_LABEL }}
     steps:
     - name: Checkout
       uses: actions/checkout@v6
