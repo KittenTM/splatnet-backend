@@ -33,10 +33,10 @@ async def get_my_profile(request: Request, db: DBSession = Depends(get_db)):
         decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
 
         token_data = auth.get_token(user.username, decrypted_pass)
-        if not token_data or "token" not in token_data:
+        if not token_data or "access_token" not in token_data:
             return RedirectResponse(url="/sign_in/")
 
-        profile_data = auth.get_profile(token_data["token"])
+        profile_data = auth.get_profile(token_data["access_token"])
         if not profile_data:
             raise HTTPException(status_code=404, detail="Profile not found")
 

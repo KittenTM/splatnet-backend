@@ -37,7 +37,7 @@ async def login(
     try:
         print("fetching spfn token")
         data = auth.get_token(username, password)
-        if not data or "token" not in data:
+        if not data or "access_token" not in data:
             print("auth failed")
             return RedirectResponse(f"{auth_path}{sep}error=auth&username={username}", 303)
 

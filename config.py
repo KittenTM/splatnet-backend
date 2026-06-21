@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     twitter_client_id: str
     twitter_client_secret: str
     twitter_redirect_uri: str
+    account_client_secret: str
 
     model_config = SettingsConfigDict(
         env_file=[

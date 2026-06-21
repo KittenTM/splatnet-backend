@@ -1,35 +1,36 @@
 import requests
-import base64
-from argon2 import PasswordHasher
+from config import settings
 
 API_URL = "https://account.spfn.net/api/v2"
-ph = PasswordHasher()
-
-def hash_password(password: str):
-    return ph.hash(password)
-
-def verify_password(hashed: str, password: str):
-    try:
-        return ph.verify(hashed, password)
-    except Exception:
-        return False
+CLIENT_ID = "splatnet"
+CLIENT_SECRET = settings.account_client_secret
 
 def get_token(username, password):
-    creds = f"{username} {password}"
-    encoded = base64.b64encode(creds.encode()).decode()
+    url = f"{API_URL}/oauth2/generate_token"
     
-    headers = {
-        "Authorization": f"Basic {encoded}",
-        "User-Agent": "saturday & allison should lwk kiss..."
+    payload = {
+        "grant_type": "password",
+        "username": username,
+        "password": password,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
     }
     
-    response = requests.get(f"{API_URL}/oauth2/generate_token", headers=headers, timeout=10)
+    headers = {
+        "User-Agent": "chiyo & eri should lwk kiss..."
+    }
+    
+    response = requests.post(url, data=payload, headers=headers, timeout=10)
     return response.json() if response.ok else None
 
 def get_profile(token):
+    url = f"{API_URL}/users/@me/profile"
+    
     headers = {
         "Authorization": f"Bearer {token}",
-        "User-Agent": "every update im going to change this user agent because im bored!!"
+        "User-Agent": "lets make the most of the night like were gonna die young!!"
     }
-    response = requests.get(f"{API_URL}/users/@me/profile", headers=headers, timeout=10)
-    return response.text if response.ok else None
+    
+    response = requests.get(url, headers=headers, timeout=10)
+    
+    return response.json() if response.ok else None
