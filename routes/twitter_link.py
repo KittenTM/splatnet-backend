@@ -93,7 +93,7 @@ async def confirm_twitter(state: str, code: str, db: DBSession = Depends(get_db)
     decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
     profile_auth = auth.get_token(user.username, decrypted_pass)
     
-    profile_response = auth.get_profile(profile_auth["token"])
+    profile_response = auth.get_profile(profile_auth["access_token"])
     
     if isinstance(profile_response, str):
         try:
@@ -149,7 +149,7 @@ async def get_twitter_status(request: Request, db: DBSession = Depends(get_db)):
     try:
         decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
         profile_auth = auth.get_token(user.username, decrypted_pass)
-        profile_res = auth.get_profile(profile_auth["token"])
+        profile_res = auth.get_profile(profile_auth["access_token"])
         
         if isinstance(profile_res, str):
             profile_data = json.loads(profile_res)
@@ -183,7 +183,7 @@ async def unlink_twitter(request: Request, db: DBSession = Depends(get_db)):
     user = db.query(User).filter(User.username == db_session.username).first()
     decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
     profile_auth = auth.get_token(user.username, decrypted_pass)
-    profile_data = auth.get_profile(profile_auth["token"])
+    profile_data = auth.get_profile(profile_auth["access_token"])
     
     if isinstance(profile_data, str):
         profile_data = json.loads(profile_data)

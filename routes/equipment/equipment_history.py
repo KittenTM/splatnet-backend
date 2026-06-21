@@ -27,7 +27,7 @@ async def get_history(request: Request, db: DBSession = Depends(get_db)):
     try:
         decrypted_pass = cipher.decrypt(user.spfn_pass_enc.encode()).decode()
         token_data = auth.get_token(user.username, decrypted_pass)
-        profile = json.loads(auth.get_profile(token_data["access_token"]))
+        profile = auth.get_profile(token_data["access_token"])
         pid_val = int(profile.get("pid"))
         print(f"Fetching History for PID: {pid_val}")
         
