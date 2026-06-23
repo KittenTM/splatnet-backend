@@ -1,9 +1,14 @@
 import requests
 from config import settings
+from argon2 import PasswordHasher
 
 API_URL = "https://account.spfn.net/api/v2"
 CLIENT_ID = "splatnet"
 CLIENT_SECRET = settings.account_client_secret
+ph = PasswordHasher()
+
+def hash_password(password: str):
+    return ph.hash(password)
 
 def get_token(username, password):
     url = f"{API_URL}/oauth2/generate_token"
