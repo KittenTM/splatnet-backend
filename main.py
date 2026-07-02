@@ -14,6 +14,7 @@ from routes.equipment import equipment_history
 from routes.equipment import equipment
 from services.boss_retrieval import process_boss_file
 from routes import Ranking
+from routes import ranking_grabstats
 from routes import twitter_link
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
@@ -187,6 +188,7 @@ app.include_router(equipment_history.router, prefix="/api/v1")
 app.include_router(equipment.router, prefix="/api/v1")
 app.include_router(Ranking.router, prefix="/api/v1")
 app.include_router(twitter_link.router, prefix="/api/v1")
+app.include_router(ranking_grabstats.router, prefix="/api/v1")
 
 def start():
     uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=False)
