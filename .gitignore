@@ -6,3 +6,4 @@ node_modules
 build
 splatnet_backend.egg-info
 venv/*
+.venv/*
