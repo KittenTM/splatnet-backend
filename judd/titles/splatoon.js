@@ -19,7 +19,7 @@ module.exports = {
 
             if (parseInt(data.SessionID) > MAX_INT32) sanitizedData.SessionID = 0;
 
-            const result = await SplatfestResult.create(sanitizedData);
+            const result = await SplatfestResult.create(sanitizedData, { ordering: false, ignoreDuplicates: false });
 
             await Equipment.upsert({
                 PId: sanitizedData.PId,
