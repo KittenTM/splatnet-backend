@@ -15,29 +15,46 @@ def process_boss_file():
 
     base_url = settings.boss_url.rstrip('/')
     tasks = [
-        {"url": f"{base_url}/zvGSM4kOrXpkKnpT/schdat2?c=JP&l=en", "output": "boss.yaml"},
-        {"url": f"{base_url}/zvGSM4kOrXpkKnpT/optdat2?c=US&l=en", "output": "fes_boss.yaml"}
+        {
+            "url": f"{base_url}/zvGSM4kOrXpkKnpT/schdat2?c=JP&l=en", 
+            "filename": "VSSetting.byaml", 
+            "output": "boss.yaml"
+        },
+        {
+            "url": f"{base_url}/zvGSM4kOrXpkKnpT/optdat2?c=US&l=en", 
+            "filename": "Festival.byaml", 
+            "output": "fes_boss.yaml"
+        }
     ]
 
     try:
         success_all = True
         for task in tasks:
             master_url = task["url"]
+            target_filename = task["filename"]
             output_yaml = task["output"]
 
             print(f"data get: {master_url}")
             meta_res = requests.get(master_url, timeout=10)
             meta_res.raise_for_status()
             root = ET.fromstring(meta_res.content)
-            data_url_element = root.find(".//Url")
             
-            if data_url_element is None or not data_url_element.text:
-                print("woops! no <Url> tag found in the XML response")
+            # LMFAO HOW DID THIS FLY UNDER THE RADAR FOR SO LONG
+            real_data_url = None
+            for file_element in root.findall(".//File"):
+                filename_elem = file_element.find("Filename")
+                if filename_elem is not None and filename_elem.text == target_filename:
+                    url_elem = file_element.find("Url")
+                    if url_elem is not None and url_elem.text:
+                        real_data_url = url_elem.text.strip()
+                        break
+            
+            if not real_data_url:
+                print(f"woops! could not find URL for file '{target_filename}' in the XML response")
                 success_all = False
                 continue
 
-            real_data_url = data_url_element.text.strip()
-            print(f"parsed data url: {real_data_url}")
+            print(f"parsed data url for {target_filename}: {real_data_url}")
             res = requests.get(real_data_url, timeout=10)
             res.raise_for_status()
             
