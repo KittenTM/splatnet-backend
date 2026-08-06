@@ -47,6 +47,20 @@ async def boss_rotation(request: Request):
                 })
             return formatted
 
+        def nintydevsuranidiotforusingrgb(color_val):
+            if not color_val:
+                return "#000000"
+            if isinstance(color_val, str):
+                parts = [float(p.strip()) for p in color_val.split(",") if p.strip()]
+            elif isinstance(color_val, (list, tuple)):
+                parts = [float(p) for p in color_val]
+            else:
+                return "#000000"
+            
+            # trash 4th val
+            rgb = [round(c * 255) for c in parts[:3]]
+            return f"#{rgb[0]:02X}{rgb[1]:02X}{rgb[2]:02X}"
+
         with open("boss.yaml", "r", encoding='utf-8') as f:
             yaml_data = yaml.safe_load(f)
         
@@ -97,14 +111,19 @@ async def boss_rotation(request: Request):
                 fest_result = parse_iso(time_cfg.get("Result"))
 
                 teams = fes_yaml.get("Teams", [])
-                team_shortnames = []
+                formatted_teams = []
                 for team in teams:
-                    team_shortnames.append(team.get("ShortName", {}))
+                    raw_color = team.get("Color")
+                    formatted_teams.append({
+                        "shortName": team.get("ShortName", {}),
+                        "color": nintydevsuranidiotforusingrgb(raw_color)
+                    })
 
                 response_data["splatfestivalSplatfest"] = {
                     "stages": format_stages(fes_yaml.get("Stages", [])),
                     "mode": RULE_NAMES.get(fes_yaml.get("Rule"), "TurfWar"),
-                    "teams": team_shortnames,
+                    "teams": formatted_teams,
+                    "battleResultRate": fes_yaml.get("BattleResultRate", {}),
                     "time": {
                         "start": fest_start,
                         "end": fest_end,
