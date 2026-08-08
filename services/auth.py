@@ -2,7 +2,7 @@ import requests
 from config import settings
 from argon2 import PasswordHasher
 
-API_URL = "https://account.spfn.net/api/v2"
+API_URL = "https://account.spbr.net/api/v2"
 CLIENT_ID = "splatnet"
 CLIENT_SECRET = settings.account_client_secret
 ph = PasswordHasher()

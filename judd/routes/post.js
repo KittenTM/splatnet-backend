@@ -34,7 +34,7 @@ router.post('/post', postLimiter, async (request, response, next) => {
     try {
         let isPidValid = true;
         try {
-            const spfnCheck = await axios.get(`https://account.spfn.net/api/v2/users/${pid}/mii`);
+            const spfnCheck = await axios.get(`https://account.spbr.net/api/v2/users/${pid}/mii`);
             if (typeof spfnCheck.data === 'string' && spfnCheck.data.includes('<code>0008</code>')) {
                 isPidValid = false;
             }
