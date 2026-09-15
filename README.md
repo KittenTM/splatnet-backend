@@ -1,3 +1,6 @@
+> [!CAUTION]
+> # Support for this server has ended on 2026-9-15, as it has been [superseded.](https://git.spbr.net/mystiko/wup-agmj.app.nintendo.net)
+
 <p align= "center">
 <img src="https://git.crafterpika.cc/kittentm/splatnet-backend/raw/branch/main/cover.png" width=600>
 <br>
@@ -22,74 +25,3 @@
 This is the backend for the [SplatNet](https://git.crafterpika.cc/kittentm/splatnet) Revival frontend.
 
 </div>
-
-## Self-hosting
-
-> [!IMPORTANT]  
-> This project is not easy to self host!! Please please please read the console logs before asking for help.
-
-### Installing from source
-
-Telemetry is technically not required for the server to run, however it is required for most functions on the website. Judd is run via Node `/judd`. First change directories to Judd, and install the node modules.
-```
-npm install
-```
-
-To start, install either Python `3.11` or `3.12`. While newer versions aren't tested they should work fine. Note that anything **ABOVE** 3.12 will require building oead from source, as it is a required dependency. View their documentation [here](https://oead.readthedocs.io/en/stable/about.html#building-from-source). Then install using:
-```
-pip install . -v
-```
-
-> [!NOTE]  
-> It is not required to run in verbose, however is reccomended as otherwise it looks like it has hung. The installation progress will take awhile as it copies all Node modules.
-
-Now you must configure your `.env` A example `.env` is included for you. For a full explanation, jump to [.env configuration](https://git.crafterpika.cc/kittentm/splatnet-backend#env-configuration).
-Once done, run:
-```
-splatnet
-```
-This uses the `.env` found in your current directory.
-
-### Docker
-Alternatively, this is available as a Docker image.
-
-> [!NOTE]  
-> Postgres & incoming connections will have to be manually allowed through into Docker
-
-```
-docker run kittentm/splatnet-backend:latest
-```
-
-By default, the program will look for the `.env` in the same directory main.py is located. If you wish to not do that, you can manually specify a `.env`
-
-Here is an example of that, it pulls from your current directory for the .env.
-```
-docker run --env-file .env kittentm/splatnet-backend:latest
-```
-
-## DB Config
-
-This project requires postgres. Database setup is automatic upon startup, so all you need to do is add your database URL in the .env.
-
-## .env configuration
-The .env file is used for server setup. A example one with the fields already there has been provided for your pleasure. Rename it to .env & fill in the fields.
-
-| Field Name | Type | Default Value | Description / Usage |
-| :--- | :--- | :--- | :--- |
-| `port` | `int` | `5000` | The port the API will listen on |
-| `db_url` | `str` | *Required* | Connection string for the database |
-| `fernet_key` | `str` | *Required* | Key used for DB encryption |
-| `cookie_httponly` | `bool` | `True` | Primarily for debugging, controls the flag in cookies |
-| `frontend_url` | `str` | *Required* | The URL where the frontend is hosted |
-| `boss_url` | `str` | *Required* | Endpoint URL for retrieving Boss |
-| `boss_aes_key` | `str` | *Required* | AES key for Boss |
-| `boss_hmac_key` | `str` | *Required* | HMAC key for Boss |
-| `cookie_secure` | `bool` | `True` | Primarily for debugging, controls the flag in cookies |
-| `judd_port` | `int` | `4000` | The port the Judd (telemetry) server will listen on |
-| `webhook_url` | str | *Required* | Where logging of blacklist.json will be sent to |
-| `twitter_client_id` | `str` | *Required* | Twitter API client id |
-| `twitter_client_secret` | `str` | *Required* | Twitter API Client secret |
-| `twitter_redirect_uri` | `str` | *Required* | Where twitter redirects after logging in. Must match whats set in the API key. |
-
-> [!TIP]
-> For dumping your boss keys, see [this](https://github.com/PretendoNetwork/BetterKeyDumper/releases/tag/v1.0.0) HBL app. Note that the keys shown on the screen are garbage, I reccomend using a hex editor on the files it dumps.
